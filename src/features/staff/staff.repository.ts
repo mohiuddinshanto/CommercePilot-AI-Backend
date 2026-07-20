@@ -1,8 +1,8 @@
 import { Db, ObjectId, Filter } from "mongodb";
-import { getDatabase } from "../../config/database";
-import { COLLECTIONS } from "../../constants";
-import { escapeRegex } from "../../utils/escape-regex";
-import { StaffMemberDocument } from "./staff.types";
+import { getDatabase } from "../../config/database.js";
+import { COLLECTIONS } from "../../constants/index.js";
+import { escapeRegex } from "../../utils/escape-regex.js";
+import { StaffMemberDocument } from "./staff.types.js";
 
 export class StaffRepository {
   constructor(private db: Db) {}

@@ -1,8 +1,8 @@
 import { ObjectId } from "mongodb";
-import { InventoryMovementDocument } from "../inventory/inventory.types";
+import { InventoryMovementDocument } from "../inventory/inventory.types.js";
 
-type ProductRepo = ReturnType<typeof import("../products/product.repository").getProductRepository>;
-type InventoryRepo = ReturnType<typeof import("../inventory/inventory.repository").getInventoryRepository>;
+type ProductRepo = ReturnType<typeof import("../products/product.repository.js").getProductRepository>;
+type InventoryRepo = ReturnType<typeof import("../inventory/inventory.repository.js").getInventoryRepository>;
 
 export async function restoreInventory(
   storeId: string,

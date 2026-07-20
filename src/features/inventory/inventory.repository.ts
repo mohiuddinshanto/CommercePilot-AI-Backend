@@ -1,7 +1,7 @@
 import { ObjectId, Collection, Filter, UpdateFilter, Db } from "mongodb";
-import { getDatabase } from "../../config/database";
-import { COLLECTIONS } from "../../constants";
-import { InventoryDocument, InventoryMovementDocument } from "./inventory.types";
+import { getDatabase } from "../../config/database.js";
+import { COLLECTIONS } from "../../constants/index.js";
+import { InventoryDocument, InventoryMovementDocument } from "./inventory.types.js";
 
 export class InventoryRepository {
   constructor(private db: Db) {}

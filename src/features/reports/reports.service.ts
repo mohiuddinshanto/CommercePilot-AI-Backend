@@ -1,4 +1,4 @@
-import { getReportsRepository } from "./reports.repository";
+import { getReportsRepository } from "./reports.repository.js";
 import {
   ReportQueryParams,
   DashboardSummaryData,
@@ -14,7 +14,7 @@ import {
   ProfitReportData,
   MostReturnedProductData,
   DailySalesBreakdown,
-} from "./reports.types";
+} from "./reports.types.js";
 
 export class ReportsService {
   private repo = getReportsRepository();

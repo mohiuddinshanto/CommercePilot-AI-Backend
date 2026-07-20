@@ -1,5 +1,5 @@
-import { getAdminRepository } from "./admin.repository";
-import { getAuthRepository } from "../auth/auth.repository";
+import { getAdminRepository } from "./admin.repository.js";
+import { getAuthRepository } from "../auth/auth.repository.js";
 import {
   PlatformDashboard,
   AdminStore,
@@ -11,10 +11,10 @@ import {
   UpdateUserStatusInput,
   UpdateSubscriptionInput,
   AdminQueryParams,
-} from "./admin.types";
-import { ACTIVITY_ACTION } from "../../constants";
-import { NotFoundError, ValidationError } from "../../utils/error-handler";
-import { parsePaginationParams } from "../../utils/pagination";
+} from "./admin.types.js";
+import { ACTIVITY_ACTION } from "../../constants/index.js";
+import { NotFoundError, ValidationError } from "../../utils/error-handler.js";
+import { parsePaginationParams } from "../../utils/pagination.js";
 
 export class AdminService {
   private repo = getAdminRepository();

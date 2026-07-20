@@ -1,11 +1,11 @@
 import { ObjectId } from "mongodb";
-import { getInventoryRepository } from "./inventory.repository";
-import { CreateInventoryInput, UpdateInventoryInput, StockMovementInput, InventoryDocument } from "./inventory.types";
-import { NotFoundError, BusinessRuleError } from "../../utils/error-handler";
-import { parsePaginationParams } from "../../utils/pagination";
-import { ACTIVITY_ACTION } from "../../constants";
-import { getAuthRepository } from "../auth/auth.repository";
-import { getSubscriptionService } from "../subscriptions/subscription.service";
+import { getInventoryRepository } from "./inventory.repository.js";
+import { CreateInventoryInput, UpdateInventoryInput, StockMovementInput, InventoryDocument } from "./inventory.types.js";
+import { NotFoundError, BusinessRuleError } from "../../utils/error-handler.js";
+import { parsePaginationParams } from "../../utils/pagination.js";
+import { ACTIVITY_ACTION } from "../../constants/index.js";
+import { getAuthRepository } from "../auth/auth.repository.js";
+import { getSubscriptionService } from "../subscriptions/subscription.service.js";
 
 export class InventoryService {
   private repo = getInventoryRepository();

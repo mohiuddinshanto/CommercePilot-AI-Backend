@@ -1,8 +1,8 @@
 import { Db, ObjectId, Filter } from "mongodb";
-import { getDatabase } from "../../config/database";
-import { COLLECTIONS } from "../../constants";
-import { escapeRegex } from "../../utils/escape-regex";
-import { ProductDocument } from "./product.types";
+import { getDatabase } from "../../config/database.js";
+import { COLLECTIONS } from "../../constants/index.js";
+import { escapeRegex } from "../../utils/escape-regex.js";
+import { ProductDocument } from "./product.types.js";
 
 export class ProductRepository {
   constructor(private db: Db) {}
@@ -48,6 +48,7 @@ export class ProductRepository {
         { sku: searchRegex },
         { barcode: searchRegex },
         { description: searchRegex },
+        { shortDescription: searchRegex },
       ];
     }
 
@@ -78,6 +79,33 @@ export class ProductRepository {
     return { items, total };
   }
 
+  /** Read-only public storefront catalog. Private stock/cost fields are not serialized by its route. */
+  async findPublic(options?: { skip?: number; limit?: number; search?: string; categoryId?: string; minPrice?: number; maxPrice?: number; sort?: Record<string, 1 | -1> }): Promise<{ items: ProductDocument[]; total: number }> {
+    const filter: Filter<ProductDocument> = { isDeleted: false, status: "active", stock: { $gt: 0 } };
+    if (options?.categoryId) filter.categoryId = options.categoryId;
+    if (options?.search) {
+      const expression = { $regex: escapeRegex(options.search), $options: "i" };
+      filter.$or = [{ name: expression }, { description: expression }, { shortDescription: expression }, { tags: expression }];
+    }
+    if (options?.minPrice !== undefined || options?.maxPrice !== undefined) {
+      const priceFilter: Record<string, number> = {};
+      if (options?.minPrice !== undefined) priceFilter.$gte = options.minPrice;
+      if (options?.maxPrice !== undefined) priceFilter.$lte = options.maxPrice;
+      filter.sellingPrice = priceFilter as Filter<ProductDocument>["sellingPrice"];
+    }
+    const collection = this.db.collection<ProductDocument>(COLLECTIONS.PRODUCTS);
+    const total = await collection.countDocuments(filter);
+    let cursor = collection.find(filter).sort(options?.sort || { createdAt: -1 });
+    if (options?.skip) cursor = cursor.skip(options.skip);
+    if (options?.limit) cursor = cursor.limit(options.limit);
+    return { items: await cursor.toArray(), total };
+  }
+
+  async findPublicById(productId: string): Promise<ProductDocument | null> {
+    return this.db.collection<ProductDocument>(COLLECTIONS.PRODUCTS).findOne({
+      _id: new ObjectId(productId), isDeleted: false, status: "active", stock: { $gt: 0 },
+    });
+  }
   async findByIdAndStoreId(
     productId: string,
     storeId: string
@@ -227,3 +255,5 @@ export function getProductRepository(): ProductRepository {
   }
   return productRepositoryInstance;
 }
+
+

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { getCategoryService } from "./category.service";
-import { getStoreId } from "../../utils/store";
-import { sendSuccess, sendCreated, sendPaginated, sendNoContent } from "../../utils/api-response";
+import { getCategoryService } from "./category.service.js";
+import { getStoreId } from "../../utils/store.js";
+import { sendSuccess, sendCreated, sendPaginated, sendNoContent } from "../../utils/api-response.js";
 
 export class CategoryController {
   private service = getCategoryService();

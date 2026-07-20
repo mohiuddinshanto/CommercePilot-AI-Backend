@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { AppError } from "../utils/error-handler";
-import { sendError } from "../utils/api-response";
-import { logger } from "../utils/logger";
+import { AppError } from "../utils/error-handler.js";
+import { sendError } from "../utils/api-response.js";
+import { logger } from "../utils/logger.js";
 
 export function errorHandler(
   err: Error,

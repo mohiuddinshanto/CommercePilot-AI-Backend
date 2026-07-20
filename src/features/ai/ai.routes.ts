@@ -1,13 +1,13 @@
 import { Router } from "express";
-import { AIController } from "./ai.controller";
-import { validateChatInput } from "./ai.validation";
+import { AIController } from "./ai.controller.js";
+import { validateChatInput } from "./ai.validation.js";
 import {
   requireAuth,
   requireStoreAccess,
   requireStoreApproved,
   requirePermission,
-} from "../../middleware/auth.middleware";
-import { validateObjectId } from "../../middleware/validation.middleware";
+} from "../../middleware/auth.middleware.js";
+import { validateObjectId } from "../../middleware/validation.middleware.js";
 
 const router = Router();
 
@@ -16,6 +16,15 @@ function getController(): AIController {
 }
 
 router.post(
+  "/chat/stream",
+  requireAuth(),
+  requireStoreAccess(),
+  requireStoreApproved(),
+  requirePermission("ai"),
+  validateChatInput,
+  (req, res, next) => getController().streamChat(req, res, next)
+);
+router.post(
   "/chat",
   requireAuth(),
   requireStoreAccess(),
@@ -23,6 +32,15 @@ router.post(
   requirePermission("ai"),
   validateChatInput,
   (req, res, next) => getController().chat(req, res, next)
+);
+
+router.post(
+  "/generate",
+  requireAuth(),
+  requireStoreAccess(),
+  requireStoreApproved(),
+  requirePermission("ai"),
+  (req, res, next) => getController().generate(req, res, next)
 );
 
 router.get(
@@ -55,3 +73,5 @@ router.delete(
 );
 
 export { router as aiRoutes };
+
+

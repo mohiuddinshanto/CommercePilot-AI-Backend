@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { ValidationError } from "../../utils/error-handler";
-import { BUNDLE_STATUS } from "../../constants";
+import { ValidationError } from "../../utils/error-handler.js";
+import { BUNDLE_STATUS } from "../../constants/index.js";
 
 export function validateBundleInput(
   req: Request,

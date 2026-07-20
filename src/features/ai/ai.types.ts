@@ -128,3 +128,18 @@ export interface StoreAIContext {
     active: number;
   };
 }
+
+export interface GenerateContentInput {
+  contentType: "product_description" | "social_post" | "blog_outline" | "email_newsletter";
+  titleOrKeywords: string;
+  keyFeatures?: string;
+  tone: "professional" | "friendly" | "casual" | "excited" | "persuasive";
+  length: "short" | "medium" | "long";
+}
+
+export interface GenerateContentResponse {
+  content: string;
+  tokensUsed: number;
+  model: string;
+}
+

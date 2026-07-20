@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { getSubscriptionService } from "./subscription.service";
-import { getStoreId } from "../../utils/store";
-import { sendSuccess, sendCreated } from "../../utils/api-response";
+import { getSubscriptionService } from "./subscription.service.js";
+import { getStoreId } from "../../utils/store.js";
+import { sendSuccess, sendCreated } from "../../utils/api-response.js";
 
 export class SubscriptionController {
   private service = getSubscriptionService();
@@ -23,7 +23,7 @@ export class SubscriptionController {
     try {
       const storeId = getStoreId(_req);
       const subscription = await this.service.getSubscription(storeId);
-      sendSuccess(res, "Subscription retrieved.", subscription);
+      sendSuccess(res, "Subscription retrieved.", subscription ?? null);
     } catch (error) {
       next(error);
     }
@@ -83,6 +83,10 @@ export class SubscriptionController {
     try {
       const storeId = getStoreId(_req);
       const subscription = await this.service.getSubscription(storeId);
+      if (!subscription) {
+        sendSuccess(res, "Usage retrieved.", null);
+        return;
+      }
       sendSuccess(res, "Usage retrieved.", subscription.usage);
     } catch (error) {
       next(error);

@@ -1,7 +1,7 @@
 import { Db, ObjectId } from "mongodb";
-import { getDatabase } from "../../config/database";
-import { COLLECTIONS } from "../../constants";
-import { AIConversationDocument, AIMessage, StoreContextData } from "./ai.types";
+import { getDatabase } from "../../config/database.js";
+import { COLLECTIONS } from "../../constants/index.js";
+import { AIConversationDocument, AIMessage, StoreContextData } from "./ai.types.js";
 
 export class AIRepository {
   constructor(private db: Db) {}

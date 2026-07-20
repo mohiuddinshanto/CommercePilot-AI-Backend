@@ -1,13 +1,13 @@
 import { Router } from "express";
-import { BundleController } from "./bundles.controller";
+import { BundleController } from "./bundles.controller.js";
 import {
   requireAuth,
   requireStoreAccess,
   requireStoreApproved,
   requirePermission,
-} from "../../middleware/auth.middleware";
-import { validateObjectId } from "../../middleware/validation.middleware";
-import { validateBundleInput } from "./bundles.validation";
+} from "../../middleware/auth.middleware.js";
+import { validateObjectId } from "../../middleware/validation.middleware.js";
+import { validateBundleInput } from "./bundles.validation.js";
 
 const router = Router();
 

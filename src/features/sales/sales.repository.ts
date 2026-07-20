@@ -1,8 +1,8 @@
 import { Db, ObjectId, Filter } from "mongodb";
-import { getDatabase } from "../../config/database";
-import { COLLECTIONS } from "../../constants";
-import { escapeRegex } from "../../utils/escape-regex";
-import { SaleDocument } from "./sales.types";
+import { getDatabase } from "../../config/database.js";
+import { COLLECTIONS } from "../../constants/index.js";
+import { escapeRegex } from "../../utils/escape-regex.js";
+import { SaleDocument } from "./sales.types.js";
 
 export class SaleRepository {
   constructor(private db: Db) {}

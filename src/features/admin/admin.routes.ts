@@ -1,16 +1,16 @@
 import { Router } from "express";
-import { AdminController } from "./admin.controller";
+import { AdminController } from "./admin.controller.js";
 import {
   validateUpdateStoreStatus,
   validateUpdateUserStatus,
   validateUpdateSubscription,
-} from "./admin.validation";
+} from "./admin.validation.js";
 import {
   requireAuth,
   requireStoreAccess,
-} from "../../middleware/auth.middleware";
-import { requireSuperAdmin } from "../../middleware/role.middleware";
-import { validateObjectId } from "../../middleware/validation.middleware";
+} from "../../middleware/auth.middleware.js";
+import { requireSuperAdmin } from "../../middleware/role.middleware.js";
+import { validateObjectId } from "../../middleware/validation.middleware.js";
 
 const router = Router();
 

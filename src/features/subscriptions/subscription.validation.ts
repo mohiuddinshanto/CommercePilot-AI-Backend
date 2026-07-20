@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { ValidationError } from "../../utils/error-handler";
-import { PLANS } from "../../constants";
+import { ValidationError } from "../../utils/error-handler.js";
+import { PLANS } from "../../constants/index.js";
 
 const VALID_PLANS = Object.values(PLANS);
 const VALID_BILLING_CYCLES = ["monthly", "yearly"];

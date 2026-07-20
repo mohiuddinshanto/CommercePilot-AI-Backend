@@ -1,13 +1,13 @@
 import { Router } from "express";
-import { ProductController } from "./product.controller";
+import { ProductController } from "./product.controller.js";
 import {
   requireAuth,
   requireStoreAccess,
   requireStoreApproved,
   requirePermission,
-} from "../../middleware/auth.middleware";
-import { validateObjectId } from "../../middleware/validation.middleware";
-import { validateProductInput } from "./product.validation";
+} from "../../middleware/auth.middleware.js";
+import { validateObjectId } from "../../middleware/validation.middleware.js";
+import { validateProductInput } from "./product.validation.js";
 
 const router = Router();
 

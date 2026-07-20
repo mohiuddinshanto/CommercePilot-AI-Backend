@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { getSaleService } from "./sales.service";
-import { getStoreId } from "../../utils/store";
-import { sendSuccess, sendCreated, sendPaginated, sendNoContent } from "../../utils/api-response";
+import { getSaleService } from "./sales.service.js";
+import { getStoreId } from "../../utils/store.js";
+import { sendSuccess, sendCreated, sendPaginated, sendNoContent } from "../../utils/api-response.js";
 
 export class SaleController {
   private service = getSaleService();

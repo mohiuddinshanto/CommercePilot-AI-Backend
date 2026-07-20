@@ -1,7 +1,7 @@
 import { Db, ObjectId } from "mongodb";
-import { getDatabase } from "../../config/database";
-import { COLLECTIONS } from "../../constants";
-import { UserDocument, StoreDocument, ActivityLogDocument } from "./auth.types";
+import { getDatabase } from "../../config/database.js";
+import { COLLECTIONS } from "../../constants/index.js";
+import { UserDocument, StoreDocument, ActivityLogDocument } from "./auth.types.js";
 
 export class AuthRepository {
   constructor(private db: Db) {}
@@ -46,7 +46,7 @@ export class AuthRepository {
         {
           $set: {
             storeId,
-            accountStatus: "pending",
+            accountStatus: "approved",
             updatedAt: new Date().toISOString(),
           },
         }

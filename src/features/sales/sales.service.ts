@@ -1,16 +1,16 @@
 import { ObjectId } from "mongodb";
-import { getClient } from "../../config/database";
-import { getSaleRepository } from "./sales.repository";
-import { CreateSaleInput, UpdateSaleInput, SaleDocument } from "./sales.types";
-import { getProductRepository } from "../products/product.repository";
-import { getInventoryRepository } from "../inventory/inventory.repository";
-import { getBundleRepository } from "../bundles/bundles.repository";
-import { NotFoundError, BusinessRuleError, ValidationError } from "../../utils/error-handler";
-import { parsePaginationParams } from "../../utils/pagination";
-import { ACTIVITY_ACTION, PAYMENT_STATUS, SALE_STATUS } from "../../constants";
-import { getAuthRepository } from "../auth/auth.repository";
-import { restoreInventory } from "../shared/inventory-restore";
-import { roundCurrency } from "../../utils/helpers";
+import { getClient } from "../../config/database.js";
+import { getSaleRepository } from "./sales.repository.js";
+import { CreateSaleInput, UpdateSaleInput, SaleDocument } from "./sales.types.js";
+import { getProductRepository } from "../products/product.repository.js";
+import { getInventoryRepository } from "../inventory/inventory.repository.js";
+import { getBundleRepository } from "../bundles/bundles.repository.js";
+import { NotFoundError, BusinessRuleError, ValidationError } from "../../utils/error-handler.js";
+import { parsePaginationParams } from "../../utils/pagination.js";
+import { ACTIVITY_ACTION, PAYMENT_STATUS, SALE_STATUS } from "../../constants/index.js";
+import { getAuthRepository } from "../auth/auth.repository.js";
+import { restoreInventory } from "../shared/inventory-restore.js";
+import { roundCurrency } from "../../utils/helpers.js";
 
 export class SaleService {
   private saleRepo = getSaleRepository();

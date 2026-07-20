@@ -1,23 +1,23 @@
-import { getCategoryRepository } from "./category.repository";
+import { getCategoryRepository } from "./category.repository.js";
 import {
   CreateCategoryInput,
   UpdateCategoryInput,
   CategoryDocument,
   CategoryQueryParams,
-} from "./category.types";
+} from "./category.types.js";
 import {
   NotFoundError,
   ConflictError,
-} from "../../utils/error-handler";
-import { ACTIVITY_ACTION } from "../../constants";
-import { getAuthRepository } from "../auth/auth.repository";
-import { getSubscriptionService } from "../subscriptions/subscription.service";
-import { generateSlug } from "../../utils/helpers";
+} from "../../utils/error-handler.js";
+import { ACTIVITY_ACTION } from "../../constants/index.js";
+import { getAuthRepository } from "../auth/auth.repository.js";
+import { getSubscriptionService } from "../subscriptions/subscription.service.js";
+import { generateSlug } from "../../utils/helpers.js";
 import {
   parsePaginationParams,
   buildPaginationMeta,
   parseSortParams,
-} from "../../utils/pagination";
+} from "../../utils/pagination.js";
 
 export class CategoryService {
   private repository = getCategoryRepository();

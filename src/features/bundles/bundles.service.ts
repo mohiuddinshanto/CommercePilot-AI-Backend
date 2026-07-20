@@ -1,12 +1,12 @@
 import { ObjectId } from "mongodb";
-import { getBundleRepository } from "./bundles.repository";
-import { CreateBundleInput, UpdateBundleInput, BundleDocument } from "./bundles.types";
-import { getProductRepository } from "../products/product.repository";
-import { NotFoundError, BusinessRuleError, ValidationError } from "../../utils/error-handler";
-import { parsePaginationParams } from "../../utils/pagination";
-import { ACTIVITY_ACTION, BUNDLE_STATUS } from "../../constants";
-import { getAuthRepository } from "../auth/auth.repository";
-import { generateSlug } from "../../utils/helpers";
+import { getBundleRepository } from "./bundles.repository.js";
+import { CreateBundleInput, UpdateBundleInput, BundleDocument } from "./bundles.types.js";
+import { getProductRepository } from "../products/product.repository.js";
+import { NotFoundError, BusinessRuleError, ValidationError } from "../../utils/error-handler.js";
+import { parsePaginationParams } from "../../utils/pagination.js";
+import { ACTIVITY_ACTION, BUNDLE_STATUS } from "../../constants/index.js";
+import { getAuthRepository } from "../auth/auth.repository.js";
+import { generateSlug } from "../../utils/helpers.js";
 
 export class BundleService {
   private repo = getBundleRepository();

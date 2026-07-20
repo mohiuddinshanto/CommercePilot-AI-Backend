@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import { getAIService } from "./ai.service";
-import { getStoreId } from "../../utils/store";
-import { sendSuccess, sendPaginated, sendNoContent } from "../../utils/api-response";
-import { parsePaginationParams } from "../../utils/pagination";
+import { getAIService } from "./ai.service.js";
+import { getStoreId } from "../../utils/store.js";
+import { sendSuccess, sendPaginated, sendNoContent } from "../../utils/api-response.js";
+import { parsePaginationParams } from "../../utils/pagination.js";
 
 export class AIController {
   private service = getAIService();
@@ -21,6 +21,35 @@ export class AIController {
     }
   }
 
+  async generate(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const storeId = getStoreId(req);
+      const userId = req.user!.id;
+      const userPlan = req.user!.plan || "starter";
+      const { contentType, titleOrKeywords, keyFeatures, tone, length } = req.body;
+
+      const result = await this.service.generateContent(
+        storeId,
+        userId,
+        { contentType, titleOrKeywords, keyFeatures, tone, length },
+        userPlan
+      );
+      sendSuccess(res, "Content generated successfully.", result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async streamChat(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const storeId = getStoreId(req); const userId = req.user!.id; const userPlan = req.user!.plan || "starter";
+      const { message, conversationId, model } = req.body;
+      res.status(200); res.setHeader("Content-Type", "text/event-stream"); res.setHeader("Cache-Control", "no-cache, no-transform"); res.setHeader("Connection", "keep-alive"); res.flushHeaders();
+      const result = await this.service.chat(storeId, userId, { message, conversationId, model }, userPlan);
+      for (let index = 0; index < result.assistantMessage.content.length; index += 24) res.write(`data: ${JSON.stringify({ type: "token", content: result.assistantMessage.content.slice(index, index + 24) })}\n\n`);
+      res.write(`data: ${JSON.stringify({ type: "done", conversationId: result.conversationId })}\n\n`); res.end();
+    } catch (error) { if (!res.headersSent) next(error); else { res.write(`data: ${JSON.stringify({ type: "error", message: "Unable to generate a response." })}\n\n`); res.end(); } }
+  }
   async listConversations(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const storeId = getStoreId(req);
@@ -67,3 +96,4 @@ export class AIController {
     }
   }
 }
+

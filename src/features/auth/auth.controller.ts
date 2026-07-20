@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { AuthService } from "./auth.service";
-import { sendSuccess, sendCreated } from "../../utils/api-response";
-import { AppError } from "../../utils/error-handler";
+import { AuthService } from "./auth.service.js";
+import { sendSuccess, sendCreated } from "../../utils/api-response.js";
+import { AppError } from "../../utils/error-handler.js";
 
 export class AuthController {
   constructor(private service: AuthService) {}

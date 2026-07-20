@@ -1,8 +1,8 @@
 import { Db, ObjectId, Filter, ClientSession } from "mongodb";
-import { getDatabase } from "../../config/database";
-import { COLLECTIONS } from "../../constants";
-import { escapeRegex } from "../../utils/escape-regex";
-import { ReturnDocument } from "./returns.types";
+import { getDatabase } from "../../config/database.js";
+import { COLLECTIONS } from "../../constants/index.js";
+import { escapeRegex } from "../../utils/escape-regex.js";
+import { ReturnDocument } from "./returns.types.js";
 
 export class ReturnRepository {
   constructor(private db: Db) {}

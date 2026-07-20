@@ -1,14 +1,14 @@
 import { Router } from "express";
-import { StaffController } from "./staff.controller";
+import { StaffController } from "./staff.controller.js";
 import {
   requireAuth,
   requireStoreAccess,
   requireStoreApproved,
   requirePermission,
-} from "../../middleware/auth.middleware";
-import { requireRole } from "../../middleware/role.middleware";
-import { validateObjectId } from "../../middleware/validation.middleware";
-import { validateStaffInput, validateAcceptInvitation } from "./staff.validation";
+} from "../../middleware/auth.middleware.js";
+import { requireRole } from "../../middleware/role.middleware.js";
+import { validateObjectId } from "../../middleware/validation.middleware.js";
+import { validateStaffInput, validateAcceptInvitation } from "./staff.validation.js";
 
 const router = Router();
 

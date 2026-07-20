@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { ReportsController } from "./reports.controller";
+import { ReportsController } from "./reports.controller.js";
 import {
   requireAuth,
   requireStoreAccess,
   requireStoreApproved,
   requirePermission,
-} from "../../middleware/auth.middleware";
+} from "../../middleware/auth.middleware.js";
 
 const router = Router();
 

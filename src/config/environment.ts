@@ -1,7 +1,13 @@
 import dotenv from "dotenv";
-import { logger } from "../utils/logger";
+import { logger } from "../utils/logger.js";
 
 dotenv.config();
+
+function parseOrigins(raw: string): string[] {
+  return raw.split(",").map((s) => s.trim()).filter(Boolean);
+}
+
+const clientUrlRaw = process.env.CLIENT_URL || "http://localhost:3000";
 
 export const environment = {
   NODE_ENV: process.env.NODE_ENV || "development",
@@ -10,7 +16,8 @@ export const environment = {
   DB_NAME: process.env.DB_NAME || "commercepilot_ai",
   BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET || "",
   BETTER_AUTH_URL: process.env.BETTER_AUTH_URL || "http://localhost:5000",
-  CLIENT_URL: process.env.CLIENT_URL || "http://localhost:3000",
+  CLIENT_URL: clientUrlRaw,
+  CLIENT_ORIGINS: parseOrigins(clientUrlRaw),
   GROQ_API_KEY: process.env.GROQ_API_KEY || "",
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || "",
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || "",

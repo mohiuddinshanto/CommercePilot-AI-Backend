@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { getInventoryService } from "./inventory.service";
-import { getStoreId } from "../../utils/store";
-import { sendSuccess, sendCreated, sendPaginated, sendNoContent } from "../../utils/api-response";
+import { getInventoryService } from "./inventory.service.js";
+import { getStoreId } from "../../utils/store.js";
+import { sendSuccess, sendCreated, sendPaginated, sendNoContent } from "../../utils/api-response.js";
 
 export class InventoryController {
   private service = getInventoryService();

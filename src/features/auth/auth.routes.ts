@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { AuthController } from "./auth.controller";
-import { getAuthService } from "./auth.service";
-import { requireAuth, requireAccountApproved } from "../../middleware/auth.middleware";
-import { createStoreValidation } from "./auth.validation";
+import { AuthController } from "./auth.controller.js";
+import { getAuthService } from "./auth.service.js";
+import { requireAuth, requireAccountApproved } from "../../middleware/auth.middleware.js";
+import { createStoreValidation } from "./auth.validation.js";
 
 const router = Router();
 
@@ -22,7 +22,6 @@ router.get(
 router.post(
   "/store",
   requireAuth(),
-  requireAccountApproved(),
   ...createStoreValidation,
   (req, res, next) => getController().createStore(req, res, next)
 );

@@ -1,8 +1,8 @@
 import Groq from "groq-sdk";
-import { getAIRepository } from "./ai.repository";
-import { getAuthRepository } from "../auth/auth.repository";
-import { ACTIVITY_ACTION, PLAN_LIMITS } from "../../constants";
-import { environment } from "../../config/environment";
+import { getAIRepository } from "./ai.repository.js";
+import { getAuthRepository } from "../auth/auth.repository.js";
+import { ACTIVITY_ACTION, PLAN_LIMITS } from "../../constants/index.js";
+import { environment } from "../../config/environment.js";
 import {
   AIMessage,
   ChatInput,
@@ -11,8 +11,10 @@ import {
   ConversationDetail,
   StoreAIContext,
   StoreContextData,
-} from "./ai.types";
-import { NotFoundError, BusinessRuleError } from "../../utils/error-handler";
+  GenerateContentInput,
+  GenerateContentResponse,
+} from "./ai.types.js";
+import { NotFoundError, BusinessRuleError } from "../../utils/error-handler.js";
 
 const SYSTEM_PROMPT = `You are CommercePilot AI — a helpful AI Business Copilot for a multi-tenant e-commerce platform. You analyze store data and provide actionable business insights.
 
@@ -334,6 +336,87 @@ Staff: ${context.staff.total} total, ${context.staff.active} active
     } catch {
       // Activity logging should not fail the request
     }
+  }
+
+  async generateContent(
+    storeId: string,
+    userId: string,
+    input: GenerateContentInput,
+    userPlan: string
+  ): Promise<GenerateContentResponse> {
+    await this.checkPlanLimit(storeId, userId, userPlan);
+
+    const context = await this.loadStoreContext(storeId);
+
+    const lengthGuidelines = {
+      short: "Make it brief and concise, around 50-100 words.",
+      medium: "Provide a balanced outline, around 150-300 words.",
+      long: "Provide a detailed, in-depth layout, around 450-600 words.",
+    }[input.length];
+
+    const templates = {
+      product_description: `Generate a compelling and persuasive product description for: "${input.titleOrKeywords}".
+Tone of Voice: ${input.tone}
+Length Guideline: ${lengthGuidelines}
+Key Features/Bullet Points to include:
+${input.keyFeatures || "Not provided."}
+
+Focus on listing the benefits, creating a hook, and a call-to-action suitable for a high-converting e-commerce product page. Use relevant store context if helpful: Store Currency: ${context.store.currency}, Store Name: ${context.store.name}.`,
+
+      social_post: `Create an engaging social media post (Facebook, Instagram, LinkedIn) to promote: "${input.titleOrKeywords}".
+Tone of Voice: ${input.tone}
+Length Guideline: ${lengthGuidelines}
+Key Highlights to include:
+${input.keyFeatures || "Not provided."}
+
+Include attention-grabbing hook lines, emojis appropriate for the tone, and 3-5 relevant hashtags. Create a strong call-to-action directing followers to the store.`,
+
+      blog_outline: `Create a structured, search-engine-optimized blog post outline or content draft for: "${input.titleOrKeywords}".
+Tone of Voice: ${input.tone}
+Length Guideline: ${lengthGuidelines}
+Key Points/Topics to cover:
+${input.keyFeatures || "Not provided."}
+
+Provide a clean heading structure (H2, H3) and short descriptions of what each section should discuss.`,
+
+      email_newsletter: `Write a marketing email newsletter for store customers. Subject or theme: "${input.titleOrKeywords}".
+Tone of Voice: ${input.tone}
+Length Guideline: ${lengthGuidelines}
+Key Content / Offers / Features to include:
+${input.keyFeatures || "Not provided."}
+
+Include a catchy Subject Line, Preheader text, friendly Greeting, engaging Body, and a clear, clickable Call-To-Action (CTA).`,
+    };
+
+    const prompt = templates[input.contentType] || templates.product_description;
+    const model = "llama-3.1-8b-instant";
+
+    const completion = await this.groq.chat.completions.create({
+      messages: [
+        {
+          role: "system",
+          content: `You are CommercePilot Content AI, a specialized copywriter and e-commerce marketing specialist. You generate high-quality, professional marketing copies, product descriptions, blog layouts, and emails.
+Always structure your responses beautifully using markdown.
+Do NOT include any preamble or meta-commentary (like "Here is your generated description:" or "Sure, I can help with that"). Output ONLY the requested content directly.`,
+        },
+        { role: "user", content: prompt },
+      ],
+      model,
+      temperature: 0.8,
+      max_tokens: DEFAULT_MAX_TOKENS,
+    });
+
+    const choice = completion.choices[0];
+    const generatedContent = choice?.message?.content || "Could not generate content. Please try again.";
+    const tokensUsed = completion.usage?.total_tokens || 0;
+
+    await this.logActivity(storeId, userId, `Generated ${input.contentType}: ${input.titleOrKeywords.substring(0, 100)}`);
+
+    return {
+      content: generatedContent,
+      tokensUsed,
+      model,
+    };
   }
 }
 

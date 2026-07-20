@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import { getReportsService } from "./reports.service";
-import { getStoreId } from "../../utils/store";
-import { sendSuccess } from "../../utils/api-response";
-import { ReportQueryParams } from "./reports.types";
+import { getReportsService } from "./reports.service.js";
+import { getStoreId } from "../../utils/store.js";
+import { sendSuccess } from "../../utils/api-response.js";
+import { ReportQueryParams } from "./reports.types.js";
 
 export class ReportsController {
   private service = getReportsService();

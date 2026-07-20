@@ -1,6 +1,6 @@
 import { Db } from "mongodb";
-import { COLLECTIONS } from "../constants";
-import { logger } from "../utils/logger";
+import { COLLECTIONS } from "../constants/index.js";
+import { logger } from "../utils/logger.js";
 
 interface IndexDefinition {
   collection: string;

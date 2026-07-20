@@ -1,10 +1,10 @@
 import { Db, ObjectId, Filter } from "mongodb";
-import { getDatabase } from "../../config/database";
-import { COLLECTIONS, DEAD_STOCK_DAYS } from "../../constants";
-import { SaleDocument } from "../sales/sales.types";
-import { ReturnDocument } from "../returns/returns.types";
-import { ProductDocument } from "../products/product.types";
-import { InventoryDocument } from "../inventory/inventory.types";
+import { getDatabase } from "../../config/database.js";
+import { COLLECTIONS, DEAD_STOCK_DAYS } from "../../constants/index.js";
+import { SaleDocument } from "../sales/sales.types.js";
+import { ReturnDocument } from "../returns/returns.types.js";
+import { ProductDocument } from "../products/product.types.js";
+import { InventoryDocument } from "../inventory/inventory.types.js";
 import {
   ReportQueryParams,
   DashboardSummaryData,
@@ -21,7 +21,7 @@ import {
   MostReturnedProductData,
   DailySalesBreakdown,
   DailyProfitBreakdown,
-} from "./reports.types";
+} from "./reports.types.js";
 
 export class ReportsRepository {
   constructor(private db: Db) {}

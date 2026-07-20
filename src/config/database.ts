@@ -1,7 +1,7 @@
 import { MongoClient, Db } from "mongodb";
-import { environment } from "./environment";
-import { logger } from "../utils/logger";
-import { ensureIndexes } from "../database/indexes";
+import { environment } from "./environment.js";
+import { logger } from "../utils/logger.js";
+import { ensureIndexes } from "../database/indexes.js";
 
 let client: MongoClient;
 let db: Db;

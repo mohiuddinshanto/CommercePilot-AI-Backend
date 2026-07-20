@@ -1,4 +1,4 @@
-import { validateRequiredFields, validateStringLength, validateEmail } from "../../middleware/validation.middleware";
+import { validateRequiredFields, validateStringLength, validateEmail } from "../../middleware/validation.middleware.js";
 
 export const createStoreValidation = [
   validateRequiredFields(["storeName", "storeSlug", "currency", "timezone"]),

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { getStaffService } from "./staff.service";
-import { getStoreId } from "../../utils/store";
-import { sendSuccess, sendCreated, sendNoContent, sendPaginated } from "../../utils/api-response";
+import { getStaffService } from "./staff.service.js";
+import { getStoreId } from "../../utils/store.js";
+import { sendSuccess, sendCreated, sendNoContent, sendPaginated } from "../../utils/api-response.js";
 
 export class StaffController {
   private service = getStaffService();

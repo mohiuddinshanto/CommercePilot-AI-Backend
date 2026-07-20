@@ -1,24 +1,24 @@
-import { getProductRepository } from "./product.repository";
+import { getProductRepository } from "./product.repository.js";
 import {
   CreateProductInput,
   UpdateProductInput,
   ProductDocument,
   ProductQueryParams,
-} from "./product.types";
+} from "./product.types.js";
 import {
   NotFoundError,
   ConflictError,
   BusinessRuleError,
-} from "../../utils/error-handler";
-import { ACTIVITY_ACTION } from "../../constants";
-import { getAuthRepository } from "../auth/auth.repository";
-import { getSubscriptionService } from "../subscriptions/subscription.service";
-import { generateSlug } from "../../utils/helpers";
+} from "../../utils/error-handler.js";
+import { ACTIVITY_ACTION } from "../../constants/index.js";
+import { getAuthRepository } from "../auth/auth.repository.js";
+import { getSubscriptionService } from "../subscriptions/subscription.service.js";
+import { generateSlug } from "../../utils/helpers.js";
 import {
   parsePaginationParams,
   buildPaginationMeta,
   parseSortParams,
-} from "../../utils/pagination";
+} from "../../utils/pagination.js";
 
 export class ProductService {
   private repository = getProductRepository();
@@ -51,6 +51,7 @@ export class ProductService {
       barcode: input.barcode,
       name: input.name,
       slug,
+      shortDescription: input.shortDescription,
       description: input.description,
       images: input.images || [],
       costPrice: input.costPrice,
@@ -60,6 +61,8 @@ export class ProductService {
       lowStockLimit: input.lowStockLimit ?? 10,
       status: input.status || "active",
       tags: input.tags || [],
+      availableFrom: input.availableFrom,
+      priority: input.priority,
       isDeleted: false,
       createdBy: userId,
       updatedBy: userId,
@@ -250,3 +253,4 @@ export function getProductService(): ProductService {
   }
   return productServiceInstance;
 }
+

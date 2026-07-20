@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { ValidationError } from "../../utils/error-handler";
-import { STAFF_PERMISSIONS, STAFF_ROLES } from "../../constants";
-import { EMAIL_REGEX } from "../../utils/helpers";
+import { ValidationError } from "../../utils/error-handler.js";
+import { STAFF_PERMISSIONS, STAFF_ROLES } from "../../constants/index.js";
+import { EMAIL_REGEX } from "../../utils/helpers.js";
 
 export function validateStaffInput(
   req: Request,

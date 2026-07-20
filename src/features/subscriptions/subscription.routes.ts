@@ -1,13 +1,13 @@
 import { Router } from "express";
-import { SubscriptionController } from "./subscription.controller";
-import { validateCreateSubscription, validateUpgradePlan } from "./subscription.validation";
+import { SubscriptionController } from "./subscription.controller.js";
+import { validateCreateSubscription, validateUpgradePlan } from "./subscription.validation.js";
 import {
   requireAuth,
   requireStoreAccess,
   requireStoreApproved,
   requirePermission,
-} from "../../middleware/auth.middleware";
-import { requireRole } from "../../middleware/role.middleware";
+} from "../../middleware/auth.middleware.js";
+import { requireRole } from "../../middleware/role.middleware.js";
 
 const router = Router();
 

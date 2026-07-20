@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { ValidationError } from "../../utils/error-handler";
-import { PAYMENT_METHOD, PAYMENT_STATUS, SALE_STATUS } from "../../constants";
+import { ValidationError } from "../../utils/error-handler.js";
+import { PAYMENT_METHOD, PAYMENT_STATUS, SALE_STATUS } from "../../constants/index.js";
 
 export function validateSaleInput(
   req: Request,

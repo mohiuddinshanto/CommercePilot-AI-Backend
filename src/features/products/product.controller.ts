@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { getProductService } from "./product.service";
-import { getStoreId } from "../../utils/store";
-import { sendSuccess, sendCreated, sendPaginated, sendNoContent } from "../../utils/api-response";
+import { getProductService } from "./product.service.js";
+import { getStoreId } from "../../utils/store.js";
+import { sendSuccess, sendCreated, sendPaginated, sendNoContent } from "../../utils/api-response.js";
 
 export class ProductController {
   private service = getProductService();

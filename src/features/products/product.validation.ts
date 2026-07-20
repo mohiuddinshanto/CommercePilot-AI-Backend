@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { ValidationError } from "../../utils/error-handler";
+import { ValidationError } from "../../utils/error-handler.js";
 
 export function validateProductInput(
   req: Request,
@@ -48,10 +48,24 @@ export function validateProductInput(
       }
     }
 
+    if (body.images !== undefined && (!Array.isArray(body.images) || body.images.some((image: unknown) => typeof image !== "string"))) {
+      errors.push({ field: "images", message: "Images must be a list of URLs." });
+    }
+    if (body.availableFrom !== undefined && (typeof body.availableFrom !== "string" || Number.isNaN(Date.parse(body.availableFrom)))) {
+      errors.push({ field: "availableFrom", message: "Available date must be a valid date." });
+    }
+    if (body.priority !== undefined && !["low", "medium", "high"].includes(body.priority)) {
+      errors.push({ field: "priority", message: "Priority must be low, medium, or high." });
+    }
     if (body.status !== undefined) {
       const allowed = ["active", "draft", "archived"];
       if (!allowed.includes(body.status)) {
         errors.push({ field: "status", message: `Status must be one of: ${allowed.join(", ")}.` });
+      }
+    }
+    if (body.shortDescription !== undefined && body.shortDescription !== null) {
+      if (typeof body.shortDescription !== "string") {
+        errors.push({ field: "shortDescription", message: "Short description must be a string." });
       }
     }
   }
@@ -89,10 +103,24 @@ export function validateProductInput(
       }
     }
 
+    if (body.images !== undefined && (!Array.isArray(body.images) || body.images.some((image: unknown) => typeof image !== "string"))) {
+      errors.push({ field: "images", message: "Images must be a list of URLs." });
+    }
+    if (body.availableFrom !== undefined && (typeof body.availableFrom !== "string" || Number.isNaN(Date.parse(body.availableFrom)))) {
+      errors.push({ field: "availableFrom", message: "Available date must be a valid date." });
+    }
+    if (body.priority !== undefined && !["low", "medium", "high"].includes(body.priority)) {
+      errors.push({ field: "priority", message: "Priority must be low, medium, or high." });
+    }
     if (body.status !== undefined) {
       const allowed = ["active", "draft", "archived"];
       if (!allowed.includes(body.status)) {
         errors.push({ field: "status", message: `Status must be one of: ${allowed.join(", ")}.` });
+      }
+    }
+    if (body.shortDescription !== undefined && body.shortDescription !== null) {
+      if (typeof body.shortDescription !== "string") {
+        errors.push({ field: "shortDescription", message: "Short description must be a string." });
       }
     }
   }
@@ -104,3 +132,4 @@ export function validateProductInput(
 
   next();
 }
+

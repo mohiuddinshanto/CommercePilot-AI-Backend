@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { ValidationError } from "../../utils/error-handler";
+import { ValidationError } from "../../utils/error-handler.js";
 
 export function validateChatInput(req: Request, _res: Response, next: NextFunction): void {
   const errors: { field: string; message: string }[] = [];

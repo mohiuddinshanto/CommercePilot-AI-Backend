@@ -1,10 +1,10 @@
 import { Db } from "mongodb";
-import { getDatabase } from "../../config/database";
-import { COLLECTIONS } from "../../constants";
+import { getDatabase } from "../../config/database.js";
+import { COLLECTIONS } from "../../constants/index.js";
 import {
   SubscriptionDocument,
   SubscriptionUsage,
-} from "./subscription.types";
+} from "./subscription.types.js";
 
 export class SubscriptionRepository {
   constructor(private db: Db) {}

@@ -1,10 +1,10 @@
 import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { ObjectId } from "mongodb";
-import { getDatabase } from "./database";
-import { environment } from "./environment";
-import { ACTIVITY_ACTION, COLLECTIONS } from "../constants";
-import { logger } from "../utils/logger";
+import { getDatabase } from "./database.js";
+import { environment } from "./environment.js";
+import { ACTIVITY_ACTION, COLLECTIONS } from "../constants/index.js";
+import { logger } from "../utils/logger.js";
 
 // Better Auth has complex generic types.
 // Using a focused interface for the parts we access.
@@ -34,7 +34,7 @@ export function getAuth(): AuthInstance {
       database: mongodbAdapter(db),
       secret: environment.BETTER_AUTH_SECRET,
       baseURL: environment.BETTER_AUTH_URL,
-      trustedOrigins: [environment.CLIENT_URL],
+      trustedOrigins: environment.CLIENT_ORIGINS,
       emailAndPassword: {
         enabled: true,
         requireEmailVerification: false,

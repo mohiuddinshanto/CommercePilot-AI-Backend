@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { getReturnService } from "./returns.service";
-import { getStoreId } from "../../utils/store";
-import { sendSuccess, sendCreated, sendPaginated, sendNoContent } from "../../utils/api-response";
+import { getReturnService } from "./returns.service.js";
+import { getStoreId } from "../../utils/store.js";
+import { sendSuccess, sendCreated, sendPaginated, sendNoContent } from "../../utils/api-response.js";
 
 export class ReturnController {
   private service = getReturnService();

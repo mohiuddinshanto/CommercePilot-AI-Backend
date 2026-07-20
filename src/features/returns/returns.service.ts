@@ -1,17 +1,17 @@
 import { ObjectId } from "mongodb";
-import { getClient } from "../../config/database";
-import { getReturnRepository } from "./returns.repository";
-import { CreateReturnInput, UpdateReturnInput, ReturnDocument } from "./returns.types";
-import { getSaleRepository } from "../sales/sales.repository";
-import { getProductRepository } from "../products/product.repository";
-import { getInventoryRepository } from "../inventory/inventory.repository";
-import { getBundleRepository } from "../bundles/bundles.repository";
-import { getAuthRepository } from "../auth/auth.repository";
-import { NotFoundError, BusinessRuleError, ValidationError } from "../../utils/error-handler";
-import { parsePaginationParams } from "../../utils/pagination";
-import { ACTIVITY_ACTION, RETURN_STATUS } from "../../constants";
-import { restoreInventory } from "../shared/inventory-restore";
-import { roundCurrency } from "../../utils/helpers";
+import { getClient } from "../../config/database.js";
+import { getReturnRepository } from "./returns.repository.js";
+import { CreateReturnInput, UpdateReturnInput, ReturnDocument } from "./returns.types.js";
+import { getSaleRepository } from "../sales/sales.repository.js";
+import { getProductRepository } from "../products/product.repository.js";
+import { getInventoryRepository } from "../inventory/inventory.repository.js";
+import { getBundleRepository } from "../bundles/bundles.repository.js";
+import { getAuthRepository } from "../auth/auth.repository.js";
+import { NotFoundError, BusinessRuleError, ValidationError } from "../../utils/error-handler.js";
+import { parsePaginationParams } from "../../utils/pagination.js";
+import { ACTIVITY_ACTION, RETURN_STATUS } from "../../constants/index.js";
+import { restoreInventory } from "../shared/inventory-restore.js";
+import { roundCurrency } from "../../utils/helpers.js";
 
 export class ReturnService {
   private returnRepo = getReturnRepository();

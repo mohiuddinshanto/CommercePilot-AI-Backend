@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { ValidationError } from "../../utils/error-handler";
-import { RETURN_STATUS } from "../../constants";
+import { ValidationError } from "../../utils/error-handler.js";
+import { RETURN_STATUS } from "../../constants/index.js";
 
 export function validateReturnInput(
   req: Request,

@@ -1,16 +1,16 @@
 import { Router } from "express";
-import { InventoryController } from "./inventory.controller";
+import { InventoryController } from "./inventory.controller.js";
 import {
   requireAuth,
   requireStoreAccess,
   requireStoreApproved,
   requirePermission,
-} from "../../middleware/auth.middleware";
-import { validateObjectId } from "../../middleware/validation.middleware";
+} from "../../middleware/auth.middleware.js";
+import { validateObjectId } from "../../middleware/validation.middleware.js";
 import {
   validateInventoryInput,
   validateStockMovementInput,
-} from "./inventory.validation";
+} from "./inventory.validation.js";
 
 const router = Router();
 

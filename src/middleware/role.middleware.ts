@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { AuthorizationError } from "../utils/error-handler";
+import { AuthorizationError } from "../utils/error-handler.js";
 
 export function requireRole(...allowedRoles: string[]) {
   return (req: Request, _res: Response, next: NextFunction): void => {

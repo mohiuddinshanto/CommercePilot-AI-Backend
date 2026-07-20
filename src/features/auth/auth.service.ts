@@ -1,12 +1,12 @@
-import { getDatabase } from "../../config/database";
-import { getAuth } from "../../config/auth";
-import { AuthRepository } from "./auth.repository";
+import { getDatabase } from "../../config/database.js";
+import { getAuth } from "../../config/auth.js";
+import { AuthRepository } from "./auth.repository.js";
 import {
   CreateStoreInput,
   UserProfile,
-} from "./auth.types";
-import { ConflictError, NotFoundError, BusinessRuleError } from "../../utils/error-handler";
-import { ACTIVITY_ACTION } from "../../constants";
+} from "./auth.types.js";
+import { ConflictError, NotFoundError, BusinessRuleError } from "../../utils/error-handler.js";
+import { ACTIVITY_ACTION } from "../../constants/index.js";
 
 export class AuthService {
   private repository: AuthRepository;
@@ -64,7 +64,7 @@ export class AuthService {
       currency: input.currency,
       timezone: input.timezone,
       plan: "starter",
-      accountStatus: "pending",
+      accountStatus: "approved",
       isActive: true,
       createdAt: now,
       updatedAt: now,

@@ -47,10 +47,16 @@ export function sendPaginated<T>(
   items: T[],
   pagination: PaginationData
 ): void {
-  const response: SuccessResponse<{ items: T[]; pagination: PaginationData }> = {
+  const response: SuccessResponse<{ items: T[]; total: number; page: number; pageSize: number; totalPages: number }> = {
     success: true,
     message: "Data retrieved successfully.",
-    data: { items, pagination },
+    data: {
+      items,
+      total: pagination.totalItems,
+      page: pagination.page,
+      pageSize: pagination.limit,
+      totalPages: pagination.totalPages,
+    },
   };
   res.status(200).json(response);
 }

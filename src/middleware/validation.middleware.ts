@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { ValidationError } from "../utils/error-handler";
-import { EMAIL_REGEX } from "../utils/helpers";
+import { ValidationError } from "../utils/error-handler.js";
+import { EMAIL_REGEX } from "../utils/helpers.js";
 
 const OBJECT_ID_REGEX = /^[0-9a-fA-F]{24}$/;
 

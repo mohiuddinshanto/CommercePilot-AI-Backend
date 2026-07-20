@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { AuthorizationError } from "./error-handler";
+import { AuthorizationError } from "./error-handler.js";
 
 /**
  * Extracts storeId from the authenticated user on the request.

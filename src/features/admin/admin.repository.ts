@@ -1,7 +1,7 @@
 import { Db, ObjectId } from "mongodb";
-import { getDatabase } from "../../config/database";
-import { COLLECTIONS } from "../../constants";
-import { escapeRegex } from "../../utils/escape-regex";
+import { getDatabase } from "../../config/database.js";
+import { COLLECTIONS } from "../../constants/index.js";
+import { escapeRegex } from "../../utils/escape-regex.js";
 import {
   PlatformDashboard,
   AdminStore,
@@ -9,7 +9,7 @@ import {
   AdminSubscription,
   ActivityLogItem,
   SystemStats,
-} from "./admin.types";
+} from "./admin.types.js";
 
 export class AdminRepository {
   constructor(private db: Db) {}

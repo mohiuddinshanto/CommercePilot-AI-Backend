@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { getAdminService } from "./admin.service";
-import { sendSuccess, sendPaginated } from "../../utils/api-response";
+import { getAdminService } from "./admin.service.js";
+import { sendSuccess, sendPaginated } from "../../utils/api-response.js";
 
 export class AdminController {
   private service = getAdminService();

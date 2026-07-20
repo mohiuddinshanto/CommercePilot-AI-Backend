@@ -1,8 +1,8 @@
 import { Db, ObjectId, Filter } from "mongodb";
-import { getDatabase } from "../../config/database";
-import { COLLECTIONS } from "../../constants";
-import { escapeRegex } from "../../utils/escape-regex";
-import { CategoryDocument } from "./category.types";
+import { getDatabase } from "../../config/database.js";
+import { COLLECTIONS } from "../../constants/index.js";
+import { escapeRegex } from "../../utils/escape-regex.js";
+import { CategoryDocument } from "./category.types.js";
 
 export class CategoryRepository {
   constructor(private db: Db) {}

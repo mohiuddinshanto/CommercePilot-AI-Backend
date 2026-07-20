@@ -1,5 +1,5 @@
-import { getSubscriptionRepository } from "./subscription.repository";
-import { getAuthRepository } from "../auth/auth.repository";
+import { getSubscriptionRepository } from "./subscription.repository.js";
+import { getAuthRepository } from "../auth/auth.repository.js";
 import {
   SubscriptionDocument,
   SubscriptionPlan,
@@ -9,9 +9,9 @@ import {
   UpgradePlanInput,
   BillingRecord,
   PLAN_PRICES,
-} from "./subscription.types";
-import { PLAN_LIMITS, ACTIVITY_ACTION } from "../../constants";
-import { NotFoundError, BusinessRuleError, ConflictError } from "../../utils/error-handler";
+} from "./subscription.types.js";
+import { PLAN_LIMITS, ACTIVITY_ACTION } from "../../constants/index.js";
+import { NotFoundError, BusinessRuleError, ConflictError } from "../../utils/error-handler.js";
 
 export class SubscriptionService {
   private repo = getSubscriptionRepository();
@@ -72,12 +72,8 @@ export class SubscriptionService {
     return subscription;
   }
 
-  async getSubscription(storeId: string): Promise<SubscriptionDocument> {
-    const subscription = await this.repo.findByStoreId(storeId);
-    if (!subscription) {
-      throw new NotFoundError("Subscription");
-    }
-    return subscription;
+  async getSubscription(storeId: string): Promise<SubscriptionDocument | null> {
+    return this.repo.findByStoreId(storeId);
   }
 
   async upgradePlan(

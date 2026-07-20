@@ -1,13 +1,13 @@
 import crypto from "crypto";
-import { getStaffRepository } from "./staff.repository";
-import { StaffMemberDocument, InviteStaffInput, UpdateStaffInput, StaffQueryParams } from "./staff.types";
-import { getAuthRepository } from "../auth/auth.repository";
-import { NotFoundError, BusinessRuleError, ValidationError } from "../../utils/error-handler";
-import { parsePaginationParams } from "../../utils/pagination";
-import { ACTIVITY_ACTION } from "../../constants";
-import { PLAN_LIMITS } from "../../constants";
-import { getSubscriptionService } from "../subscriptions/subscription.service";
-import { EMAIL_REGEX } from "../../utils/helpers";
+import { getStaffRepository } from "./staff.repository.js";
+import { StaffMemberDocument, InviteStaffInput, UpdateStaffInput, StaffQueryParams } from "./staff.types.js";
+import { getAuthRepository } from "../auth/auth.repository.js";
+import { NotFoundError, BusinessRuleError, ValidationError } from "../../utils/error-handler.js";
+import { parsePaginationParams } from "../../utils/pagination.js";
+import { ACTIVITY_ACTION } from "../../constants/index.js";
+import { PLAN_LIMITS } from "../../constants/index.js";
+import { getSubscriptionService } from "../subscriptions/subscription.service.js";
+import { EMAIL_REGEX } from "../../utils/helpers.js";
 
 export class StaffService {
   private staffRepo = getStaffRepository();

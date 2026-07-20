@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { getBundleService } from "./bundles.service";
-import { getStoreId } from "../../utils/store";
-import { sendSuccess, sendCreated, sendPaginated, sendNoContent } from "../../utils/api-response";
+import { getBundleService } from "./bundles.service.js";
+import { getStoreId } from "../../utils/store.js";
+import { sendSuccess, sendCreated, sendPaginated, sendNoContent } from "../../utils/api-response.js";
 
 export class BundleController {
   private service = getBundleService();

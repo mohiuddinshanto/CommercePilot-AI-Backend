@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { getAuth } from "../config/auth";
-import { getAuthRepository } from "../features/auth/auth.repository";
-import { getStaffRepository } from "../features/staff/staff.repository";
+import { getAuth } from "../config/auth.js";
+import { getAuthRepository } from "../features/auth/auth.repository.js";
+import { getStaffRepository } from "../features/staff/staff.repository.js";
 import {
   AuthenticationError,
   AuthorizationError,
@@ -10,8 +10,8 @@ import {
   AccountSuspendedError,
   NotFoundError,
   AppError,
-} from "../utils/error-handler";
-import { logger } from "../utils/logger";
+} from "../utils/error-handler.js";
+import { logger } from "../utils/logger.js";
 
 export interface AuthUser {
   id: string;
