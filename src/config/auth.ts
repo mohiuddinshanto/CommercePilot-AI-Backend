@@ -34,7 +34,10 @@ export function getAuth(): AuthInstance {
       database: mongodbAdapter(db),
       secret: environment.BETTER_AUTH_SECRET,
       baseURL: environment.BETTER_AUTH_URL,
-      trustedOrigins: environment.CLIENT_ORIGINS,
+      trustedOrigins: [
+        ...environment.CLIENT_ORIGINS,
+        "https://commerce-pilot-ai-delta.vercel.app",
+      ],
       emailAndPassword: {
         enabled: true,
         requireEmailVerification: false,

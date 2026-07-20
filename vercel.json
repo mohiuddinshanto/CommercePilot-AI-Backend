@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "cleanUrls": true,
   "builds": [
     {
       "src": "api/index.ts",
@@ -8,6 +7,18 @@
     }
   ],
   "routes": [
+    {
+      "src": "/(.*)",
+      "methods": ["OPTIONS"],
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Max-Age": "86400"
+      },
+      "dest": "api/index.ts"
+    },
     {
       "src": "/(.*)",
       "dest": "api/index.ts"
