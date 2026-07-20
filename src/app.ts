@@ -27,18 +27,6 @@ export async function createApp(): Promise<express.Express> {
 
   const app = express();
 
-  // Handle OPTIONS preflight BEFORE any other middleware
-  app.options("*", (_req, res) => {
-    const origin = _req.headers.origin;
-    if (origin) {
-      res.setHeader("Access-Control-Allow-Origin", origin);
-    }
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    res.setHeader("Access-Control-Allow-Credentials", "true");
-    res.setHeader("Access-Control-Max-Age", "86400");
-    res.status(204).end();
-  });
 
   app.use(helmet({
     crossOriginResourcePolicy: false,
@@ -50,6 +38,8 @@ export async function createApp(): Promise<express.Express> {
     "https://commerce-pilot-ai-delta.vercel.app",
   ].filter(Boolean);
 
+  // cors handles preflight requests too. Keeping it as the single CORS handler.
+  // This lets Express return the allowed origin and credentials headers directly.
   app.use(cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (mobile apps, curl, etc.)

@@ -1,4 +1,4 @@
-# CommercePilot AI — Backend
+# CommercePilot AI â€” Backend
 
 Express.js + TypeScript REST API with multi-tenant architecture, Better Auth, and AI Commerce Copilot.
 
@@ -30,7 +30,7 @@ npm run dev     # http://localhost:5000
 | `DB_NAME` | No | Database name (default: `commercepilot_ai`) |
 | `BETTER_AUTH_SECRET` | Yes | Auth secret (min 32 chars in production) |
 | `BETTER_AUTH_URL` | Prod | Backend URL |
-| `CLIENT_URL` | Prod | Frontend URL — comma-separated for multiple origins |
+| `CLIENT_URL` | Prod | Frontend URL â€” comma-separated for multiple origins |
 | `GROQ_API_KEY` | Yes | Groq API key (`gsk_...`) |
 | `GOOGLE_CLIENT_ID` | No | Google OAuth client ID |
 | `GOOGLE_CLIENT_SECRET` | No | Google OAuth client secret |
@@ -50,48 +50,48 @@ npm run dev     # http://localhost:5000
 
 ```
 backend/
-├── api/index.ts              # Vercel serverless entry point
-├── src/
-│   ├── config/
-│   │   ├── database.ts       # MongoDB singleton (lazy in serverless)
-│   │   ├── environment.ts    # Type-safe env vars with parseOrigins()
-│   │   └── auth.ts           # Better Auth config with trustedOrigins
-│   ├── features/
-│   │   ├── auth/             # Auth, user, store, subscription, staff management
-│   │   ├── products/         # Products + categories CRUD
-│   │   ├── inventory/        # Stock tracking, adjustments, alerts
-│   │   ├── sales/            # Point-of-sale, invoices, payments
-│   │   ├── returns/          # Return processing, refunds
-│   │   ├── customers/        # Customer management
-│   │   ├── bundles/          # Product bundles
-│   │   ├── reports/          # Sales, inventory, profit reports
-│   │   ├── analytics/        # Revenue, profit, growth analytics
-│   │   ├── ai/               # AI Commerce Copilot (Groq)
-│   │   ├── dashboard/        # Dashboard summary
-│   │   ├── activity-logs/    # Audit trail
-│   │   ├── notifications/    # User notifications
-│   │   └── admin/            # Super admin management
-│   ├── middleware/
-│   │   ├── auth.middleware.ts # requireAuth, requireStoreAccess, requirePermission
-│   │   └── error.middleware.ts
-│   ├── routes/
-│   │   └── index.ts          # All API route registration
-│   ├── scripts/
-│   │   └── seed.ts           # Demo data seeder
-│   ├── types/
-│   │   └── custom.d.ts       # Ambient type declarations (helmet, rate-limit, groq-sdk)
-│   └── utils/
-│       ├── error-handler.ts
-│       ├── logger.ts
-│       └── api-response.ts   # sendSuccess, sendPaginated, sendError
-├── vercel.json               # cleanUrls: true
-└── package.json
+â”œâ”€â”€ api/index.ts              # Vercel serverless entry point
+â”œâ”€â”€ src/
+â”‚   â”œâ”€â”€ config/
+â”‚   â”‚   â”œâ”€â”€ database.ts       # MongoDB singleton (lazy in serverless)
+â”‚   â”‚   â”œâ”€â”€ environment.ts    # Type-safe env vars with parseOrigins()
+â”‚   â”‚   â””â”€â”€ auth.ts           # Better Auth config with trustedOrigins
+â”‚   â”œâ”€â”€ features/
+â”‚   â”‚   â”œâ”€â”€ auth/             # Auth, user, store, subscription, staff management
+â”‚   â”‚   â”œâ”€â”€ products/         # Products + categories CRUD
+â”‚   â”‚   â”œâ”€â”€ inventory/        # Stock tracking, adjustments, alerts
+â”‚   â”‚   â”œâ”€â”€ sales/            # Point-of-sale, invoices, payments
+â”‚   â”‚   â”œâ”€â”€ returns/          # Return processing, refunds
+â”‚   â”‚   â”œâ”€â”€ customers/        # Customer management
+â”‚   â”‚   â”œâ”€â”€ bundles/          # Product bundles
+â”‚   â”‚   â”œâ”€â”€ reports/          # Sales, inventory, profit reports
+â”‚   â”‚   â”œâ”€â”€ analytics/        # Revenue, profit, growth analytics
+â”‚   â”‚   â”œâ”€â”€ ai/               # AI Commerce Copilot (Groq)
+â”‚   â”‚   â”œâ”€â”€ dashboard/        # Dashboard summary
+â”‚   â”‚   â”œâ”€â”€ activity-logs/    # Audit trail
+â”‚   â”‚   â”œâ”€â”€ notifications/    # User notifications
+â”‚   â”‚   â””â”€â”€ admin/            # Super admin management
+â”‚   â”œâ”€â”€ middleware/
+â”‚   â”‚   â”œâ”€â”€ auth.middleware.ts # requireAuth, requireStoreAccess, requirePermission
+â”‚   â”‚   â””â”€â”€ error.middleware.ts
+â”‚   â”œâ”€â”€ routes/
+â”‚   â”‚   â””â”€â”€ index.ts          # All API route registration
+â”‚   â”œâ”€â”€ scripts/
+â”‚   â”‚   â””â”€â”€ seed.ts           # Demo data seeder
+â”‚   â”œâ”€â”€ types/
+â”‚   â”‚   â””â”€â”€ custom.d.ts       # Ambient type declarations (helmet, rate-limit, groq-sdk)
+â”‚   â””â”€â”€ utils/
+â”‚       â”œâ”€â”€ error-handler.ts
+â”‚       â”œâ”€â”€ logger.ts
+â”‚       â””â”€â”€ api-response.ts   # sendSuccess, sendPaginated, sendError
+â”œâ”€â”€ vercel.json               # cleanUrls: true
+â””â”€â”€ package.json
 ```
 
 ## API Base URL
 
 ```
-https://commerce-pilot-aibackend-b63jib4i6.vercel.app/api/v1
+https://your-backend.vercel.app/api/v1
 ```
 
 ## Key Endpoints
@@ -226,17 +226,17 @@ https://commerce-pilot-aibackend-b63jib4i6.vercel.app/api/v1
 Every business route uses this middleware chain:
 
 ```
-request → requireAuth() → requireStoreAccess() → requireStoreApproved() → requirePermission() → controller → service → repository → MongoDB
+request â†’ requireAuth() â†’ requireStoreAccess() â†’ requireStoreApproved() â†’ requirePermission() â†’ controller â†’ service â†’ repository â†’ MongoDB
 ```
 
 - **Controller:** Validates request shape, calls service
 - **Service:** Business logic, validation rules, orchestration
-- **Repository:** Database queries only — never contains business logic
-- **AI:** Never accesses MongoDB directly — calls backend APIs through service layer
+- **Repository:** Database queries only â€” never contains business logic
+- **AI:** Never accesses MongoDB directly â€” calls backend APIs through service layer
 
 ## Multi-Tenancy
 
-Every business collection contains a `storeId` field. Every database query filters by `storeId`. Users can never access another store's data — enforced at the middleware level.
+Every business collection contains a `storeId` field. Every database query filters by `storeId`. Users can never access another store's data â€” enforced at the middleware level.
 
 ## Deployment
 
