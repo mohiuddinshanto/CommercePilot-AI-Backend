@@ -33,21 +33,14 @@ export async function createApp(): Promise<express.Express> {
     crossOriginEmbedderPolicy: false,
   }));
 
-  const allowedOrigins = [
-    ...environment.CLIENT_ORIGINS,
-    "https://commerce-pilot-ai-delta.vercel.app",
-  ].filter(Boolean);
-
   // cors handles preflight requests too. Keeping it as the single CORS handler.
   // This lets Express return the allowed origin and credentials headers directly.
   app.use(cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (mobile apps, curl, etc.)
       if (!origin) return callback(null, true);
-      // Allow configured origins
-      if (allowedOrigins.includes(origin)) return callback(null, true);
-      // Allow Vercel preview deployments
-      if (origin.endsWith(".vercel.app")) return callback(null, true);
+      // Allow configured origins (CLIENT_URL + ALLOWED_ORIGINS env vars)
+      if (environment.CLIENT_ORIGINS.includes(origin)) return callback(null, true);
       callback(null, false);
     },
     credentials: true,

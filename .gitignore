@@ -1,13 +1,12 @@
 node_modules/
 dist/
+build/
 .env
 .env.local
 .env.*.local
-*.log
-coverage/
-
-.vercel
-.env.local
+.env.vercel
 .env.development.local
 .env.production.local
+*.log
+coverage/
 .vercel

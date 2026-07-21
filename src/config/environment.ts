@@ -8,6 +8,7 @@ function parseOrigins(raw: string): string[] {
 }
 
 const clientUrlRaw = process.env.CLIENT_URL || "http://localhost:3000";
+const additionalOriginsRaw = process.env.ALLOWED_ORIGINS || "";
 
 export const environment = {
   NODE_ENV: process.env.NODE_ENV || "development",
@@ -17,7 +18,10 @@ export const environment = {
   BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET || "",
   BETTER_AUTH_URL: process.env.BETTER_AUTH_URL || "http://localhost:5000",
   CLIENT_URL: clientUrlRaw,
-  CLIENT_ORIGINS: parseOrigins(clientUrlRaw),
+  CLIENT_ORIGINS: [
+    ...parseOrigins(clientUrlRaw),
+    ...parseOrigins(additionalOriginsRaw),
+  ],
   GROQ_API_KEY: process.env.GROQ_API_KEY || "",
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || "",
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || "",
