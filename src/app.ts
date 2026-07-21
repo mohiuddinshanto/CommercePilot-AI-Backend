@@ -159,6 +159,15 @@ export async function createApp(): Promise<express.Express> {
     }
   });
 
+  app.get("/", (_req, res) => {
+    res.json({
+      name: "CommercePilot AI API",
+      version: "1.0.0",
+      docs: "/health",
+      auth: "/api/auth",
+    });
+  });
+
   app.use(notFoundHandler);
   app.use(errorHandler);
 

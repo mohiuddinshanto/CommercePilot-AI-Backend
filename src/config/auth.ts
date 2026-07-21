@@ -38,6 +38,15 @@ export function getAuth(): AuthInstance {
         ...environment.CLIENT_ORIGINS,
         "https://commerce-pilot-ai-delta.vercel.app",
       ],
+      advanced: {
+        defaultCookieAttributes: {
+          sameSite: "none",
+          secure: true,
+        },
+      },
+      account: {
+        storeStateStrategy: "cookie",
+      },
       emailAndPassword: {
         enabled: true,
         requireEmailVerification: false,
