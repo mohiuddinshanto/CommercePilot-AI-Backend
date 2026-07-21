@@ -164,3 +164,26 @@ export async function createApp(): Promise<express.Express> {
 
   return app;
 }
+// Vercel detects Express projects through a default export from src/app.ts.
+// The wrapper defers the asynchronous database-backed app initialization until
+// the first request while preserving one initialized app per function instance.
+let vercelAppPromise: Promise<express.Express> | null = null;
+
+function getVercelApp(): Promise<express.Express> {
+  if (!vercelAppPromise) {
+    vercelAppPromise = createApp();
+  }
+  return vercelAppPromise;
+}
+
+const vercelApp = express();
+vercelApp.use(async (req, res, next) => {
+  try {
+    const initializedApp = await getVercelApp();
+    initializedApp(req, res, next);
+  } catch (error) {
+    next(error);
+  }
+});
+
+export default vercelApp;
