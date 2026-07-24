@@ -39,6 +39,7 @@ export function getAuth(): AuthInstance {
         defaultCookieAttributes: {
           sameSite: "none",
           secure: true,
+          partitioned: true,
         },
       },
       account: {
