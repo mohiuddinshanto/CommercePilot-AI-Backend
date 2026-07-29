@@ -51,6 +51,7 @@ export class ReturnRepository {
       filter.$or = [
         { invoiceNumber: searchRegex },
         { customerName: searchRegex },
+        { customerPhone: searchRegex },
         { reason: searchRegex },
       ];
     }

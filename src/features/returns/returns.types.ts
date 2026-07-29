@@ -15,6 +15,7 @@ export interface ReturnDocument {
   invoiceNumber: string;
   customerId?: ObjectId | null;
   customerName: string;
+  customerPhone?: string | null;
   items: ReturnItem[];
   subtotal: number;
   refundAmount: number;

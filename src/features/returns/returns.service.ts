@@ -165,6 +165,7 @@ export class ReturnService {
           invoiceNumber: sale.invoiceNumber,
           customerId: sale.customerId || null,
           customerName: sale.customerName,
+          customerPhone: sale.customerPhone || null,
           items: input.items.map((item) => ({
             ...(item.productId ? { productId: new ObjectId(item.productId) } : {}),
             ...(item.bundleId ? { bundleId: new ObjectId(item.bundleId) } : {}),
