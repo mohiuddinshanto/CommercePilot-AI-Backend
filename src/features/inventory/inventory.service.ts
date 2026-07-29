@@ -6,6 +6,7 @@ import { parsePaginationParams } from "../../utils/pagination.js";
 import { ACTIVITY_ACTION } from "../../constants/index.js";
 import { getAuthRepository } from "../auth/auth.repository.js";
 import { getSubscriptionService } from "../subscriptions/subscription.service.js";
+import { getProductRepository } from "../products/product.repository.js";
 
 export class InventoryService {
   private repo = getInventoryRepository();
@@ -69,8 +70,23 @@ export class InventoryService {
       this.repo.countByStoreId(storeOid, filter),
     ]);
 
+    // Enrich items with product name and thumbnail
+    const productRepo = getProductRepository();
+    const productIds = [...new Set(items.map((i) => i.productId.toString()))];
+    const products = await productRepo.findByIds(productIds, storeId);
+    const productMap = new Map(products.map((p) => [p._id.toString(), p]));
+
+    const enrichedItems = items.map((item) => {
+      const product = productMap.get(item.productId.toString());
+      return {
+        ...item,
+        productName: product?.name ?? null,
+        productImage: product?.images?.[0] ?? null,
+      };
+    });
+
     return {
-      items,
+      items: enrichedItems,
       page,
       pageSize: limit,
       total,
