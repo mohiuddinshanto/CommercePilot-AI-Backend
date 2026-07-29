@@ -128,7 +128,8 @@ export function buildStaffInviteEmail(params: {
   role: string;
   invitationToken: string;
 }) {
-  const clientUrl = environment.CLIENT_URL || "http://localhost:3000";
+  // Use only the first URL if CLIENT_URL is comma-separated (e.g. for CORS config)
+  const clientUrl = (environment.CLIENT_URL || "http://localhost:3000").split(",")[0].trim();
   const acceptUrl = `${clientUrl}/accept-invite?token=${params.invitationToken}`;
   const expiresIn = "7 days";
 
