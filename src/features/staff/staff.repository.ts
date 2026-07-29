@@ -81,7 +81,7 @@ export class StaffRepository {
   ): Promise<StaffMemberDocument | null> {
     return this.db
       .collection<StaffMemberDocument>(COLLECTIONS.STAFF)
-      .findOne({ storeId, userId, status: "active", isDeleted: false });
+      .findOne({ storeId, userId, status: "active", isDeleted: { $ne: true } });
   }
 
   async findByEmailAndStoreId(

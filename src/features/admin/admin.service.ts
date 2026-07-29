@@ -245,6 +245,40 @@ export class AdminService {
   async getSystemStats(): Promise<SystemStats> {
     return this.repo.getSystemStats();
   }
+
+  async getPlanRequests(params: { page?: number; limit?: number; status?: string }): Promise<{
+    items: unknown[];
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+  }> {
+    const { page, limit, skip } = parsePaginationParams({
+      page: String(params.page || 1),
+      limit: String(params.limit || 20),
+    });
+
+    const result = await this.repo.getPlanRequests({
+      skip,
+      limit,
+      status: params.status,
+    });
+
+    return {
+      ...result,
+      page,
+      pageSize: limit,
+      totalPages: Math.ceil(result.total / limit),
+    };
+  }
+
+  async approvePlanRequest(requestId: string, adminUserId: string): Promise<void> {
+    await this.repo.approvePlanRequest(requestId, adminUserId);
+  }
+
+  async rejectPlanRequest(requestId: string, adminUserId: string): Promise<void> {
+    await this.repo.rejectPlanRequest(requestId, adminUserId);
+  }
 }
 
 let instance: AdminService | null = null;

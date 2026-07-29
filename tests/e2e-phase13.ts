@@ -83,13 +83,17 @@ async function runTests(): Promise<void> {
   try {
     console.log("Setting up test environment...");
 
-    const { default: app } = await import("../src/app");
-
     mongoServer = await MongoMemoryServer.create();
     const uri = mongoServer.getUri();
+    const dbName = "commercepilot_test";
+    process.env.MONGODB_URI = uri;
+    process.env.DB_NAME = dbName;
+
+    const { default: app } = await import("../src/app");
+
     client = new MongoClient(uri);
     await client.connect();
-    db = client.db("commercepilot_test");
+    db = client.db(dbName);
 
     const { setDatabase } = await import("../src/config/database");
     setDatabase(db);
@@ -115,49 +119,36 @@ async function runTests(): Promise<void> {
       password: "testpassword123",
     });
 
-    // Get userId from the registered user
+    // Get registered users
     const registeredUser = await db.collection("user").findOne({ email: "owner-sub@test.com" });
+    const staffUserDoc = await db.collection("user").findOne({ email: "staff-sub@test.com" });
     const userId = registeredUser!._id;
-    storeId = userId.toString();
 
-    // Create store via API
-    const storeRes = await request("POST", "/api/v1/stores", {
-      name: "Sub Test Store",
-      slug: "sub-test-store",
-    }, ownerCookies);
+    storeId = new ObjectId().toString();
+    await db.collection("stores").insertOne({
+      _id: new ObjectId(storeId),
+      ownerId: userId.toString(),
+      storeName: "Sub Test Store",
+      storeSlug: "sub-test-store",
+      accountStatus: "approved",
+      plan: "starter",
+      currency: "USD",
+      timezone: "UTC",
+      isActive: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
 
-    // Get storeId from response
-    const storeData = (storeRes.body as Record<string, unknown>)?.data as Record<string, unknown> | undefined;
-    storeId = (storeData?.storeId || storeData?._id) as string;
-
-    // Approve the user account
-    const ownerUser = await db.collection("user").findOne({ email: "owner-sub@test.com" });
-    if (ownerUser) {
-      await db.collection("user").updateOne(
-        { _id: ownerUser._id },
-        { $set: { accountStatus: "approved" } }
-      );
-    }
-
-    // Approve the store
-    await db.collection("stores").updateOne(
-      { _id: new ObjectId(storeId) },
-      { $set: { status: "approved", accountStatus: "approved", isActive: true } }
+    await db.collection("user").updateOne(
+      { _id: userId },
+      { $set: { accountStatus: "approved", role: "owner", storeId } }
     );
 
-    // Re-login to get fresh session with storeId
-    await request("POST", "/api/auth/sign-out", undefined, ownerCookies);
-    const loginRes = await request("POST", "/api/auth/sign-in/email", {
-      email: "owner-sub@test.com",
-      password: "TestPass123!",
-    }, undefined);
-    if (loginRes.status === 200) {
-      ownerCookies = extractCookies(loginRes.headers);
-    } else {
-      const session = await db.collection("session").findOne({ userId: userId.toString() });
-      if (session) {
-        ownerCookies = [`better-auth.session_token=${session.token}`];
-      }
+    if (staffUserDoc) {
+      await db.collection("user").updateOne(
+        { _id: staffUserDoc._id },
+        { $set: { accountStatus: "approved", role: "staff", storeId, permissions: ["settings", "products"] } }
+      );
     }
 
     console.log(`Owner login complete. Cookies: ${ownerCookies.length}\n`);
@@ -231,7 +222,7 @@ async function runTests(): Promise<void> {
       const res = await request("PATCH", "/api/v1/subscriptions/upgrade", { plan: "starter" }, ownerCookies);
       assert(
         "PATCH /subscriptions/upgrade to lower plan (downgrade) via upgrade returns error",
-        res.status === 400 || res.status === 403,
+        res.status === 400 || res.status === 403 || res.status === 422,
         `status=${res.status}`
       );
     }

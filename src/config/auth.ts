@@ -89,7 +89,7 @@ export function getAuth(): AuthInstance {
           plan: {
             type: "string",
             required: false,
-            input: false,
+            input: true,
             defaultValue: "starter",
           },
           isActive: {
@@ -132,7 +132,7 @@ export function getAuth(): AuthInstance {
                   action,
                   module: "auth",
                   description: isRegister
-                    ? "User registered and logged in."
+                    ? `New user registered with ${user.plan || "starter"} plan.`
                     : "User logged in.",
                   createdAt: now,
                 };

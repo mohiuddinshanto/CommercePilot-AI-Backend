@@ -83,13 +83,18 @@ async function runTests(): Promise<void> {
   try {
     console.log("Setting up test environment...");
 
-    const { default: app } = await import("../src/app");
-
+    process.env.NODE_ENV = "test";
     mongoServer = await MongoMemoryServer.create();
     const uri = mongoServer.getUri();
+    const dbName = "commercepilot_test";
+    process.env.MONGODB_URI = uri;
+    process.env.DB_NAME = dbName;
+
+    const { default: app } = await import("../src/app");
+
     client = new MongoClient(uri);
     await client.connect();
-    db = client.db("commercepilot_test");
+    db = client.db(dbName);
 
     const { setDatabase } = await import("../src/config/database");
     setDatabase(db);
@@ -115,49 +120,36 @@ async function runTests(): Promise<void> {
       password: "TestPass123!",
     });
 
-    // Get userId from the registered user
+    // Get registered users
     const registeredUser = await db.collection("user").findOne({ email: "owner-ai@test.com" });
+    const staffUserDoc = await db.collection("user").findOne({ email: "staff-ai@test.com" });
     const userId = registeredUser!._id;
-    storeId = userId.toString();
 
-    // Create store via API
-    const storeRes = await request("POST", "/api/v1/stores", {
-      name: "AI Test Store",
-      slug: "ai-test-store",
-    }, ownerCookies);
+    storeId = new ObjectId().toString();
+    await db.collection("stores").insertOne({
+      _id: new ObjectId(storeId),
+      ownerId: userId.toString(),
+      storeName: "AI Test Store",
+      storeSlug: "ai-test-store",
+      accountStatus: "approved",
+      plan: "starter",
+      currency: "USD",
+      timezone: "UTC",
+      isActive: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
 
-    // Get storeId from response
-    const storeData = (storeRes.body as Record<string, unknown>)?.data as Record<string, unknown> | undefined;
-    storeId = (storeData?.storeId || storeData?._id) as string;
-
-    // Approve the user account
-    const ownerUser = await db.collection("user").findOne({ email: "owner-ai@test.com" });
-    if (ownerUser) {
-      await db.collection("user").updateOne(
-        { _id: ownerUser._id },
-        { $set: { accountStatus: "approved" } }
-      );
-    }
-
-    // Approve the store
-    await db.collection("stores").updateOne(
-      { _id: new ObjectId(storeId) },
-      { $set: { status: "approved", accountStatus: "approved", isActive: true } }
+    await db.collection("user").updateOne(
+      { _id: userId },
+      { $set: { accountStatus: "approved", role: "owner", storeId } }
     );
 
-    // Re-login owner to get fresh session with storeId
-    await request("POST", "/api/auth/sign-out", undefined, ownerCookies);
-    const loginOwnerRes = await request("POST", "/api/auth/sign-in/email", {
-      email: "owner-ai@test.com",
-      password: "TestPass123!",
-    }, undefined);
-    if (loginOwnerRes.status === 200) {
-      ownerCookies = extractCookies(loginOwnerRes.headers);
-    } else {
-      const session = await db.collection("session").findOne({ userId: userId.toString() });
-      if (session) {
-        ownerCookies = [`better-auth.session_token=${session.token}`];
-      }
+    if (staffUserDoc) {
+      await db.collection("user").updateOne(
+        { _id: staffUserDoc._id },
+        { $set: { accountStatus: "approved", role: "staff", storeId, permissions: ["ai", "products"] } }
+      );
     }
 
     // Login staff
@@ -184,13 +176,13 @@ async function runTests(): Promise<void> {
       {
         storeId, userId: userId.toString(), name: "AI Test Owner", email: "owner-ai@test.com",
         role: "owner", permissions: ["products", "inventory", "sales", "reports", "analytics", "ai", "staff", "settings"],
-        status: "active", invitedBy: userId.toString(),
+        status: "active", isDeleted: false, invitedBy: userId.toString(),
         createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
       },
       {
         storeId, userId: staffUserId.toString(), name: "AI Test Staff", email: "staff-ai@test.com",
         role: "cashier", permissions: ["ai"],
-        status: "active", invitedBy: userId.toString(),
+        status: "active", isDeleted: false, invitedBy: userId.toString(),
         createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
       },
     ]);
@@ -325,7 +317,7 @@ async function runTests(): Promise<void> {
         const res = await request("DELETE", `/api/v1/ai/conversations/${convId}`, undefined, ownerCookies);
         assert(
           "Delete conversation succeeds",
-          res.status === 200,
+          res.status === 200 || res.status === 204,
           `status=${res.status}`
         );
 

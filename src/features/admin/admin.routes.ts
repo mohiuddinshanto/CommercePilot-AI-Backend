@@ -105,4 +105,30 @@ router.get(
   (req, res, next) => getController().getActivityLogs(req, res, next)
 );
 
+router.get(
+  "/plan-requests",
+  requireAuth(),
+  requireStoreAccess(),
+  requireSuperAdmin(),
+  (req, res, next) => getController().getPlanRequests(req, res, next)
+);
+
+router.patch(
+  "/plan-requests/:id/approve",
+  requireAuth(),
+  requireStoreAccess(),
+  requireSuperAdmin(),
+  validateObjectId("id"),
+  (req, res, next) => getController().approvePlanRequest(req, res, next)
+);
+
+router.patch(
+  "/plan-requests/:id/reject",
+  requireAuth(),
+  requireStoreAccess(),
+  requireSuperAdmin(),
+  validateObjectId("id"),
+  (req, res, next) => getController().rejectPlanRequest(req, res, next)
+);
+
 export { router as adminRoutes };

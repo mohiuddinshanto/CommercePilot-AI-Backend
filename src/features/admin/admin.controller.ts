@@ -155,4 +155,46 @@ export class AdminController {
       next(error);
     }
   }
+
+  async getPlanRequests(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const result = await this.service.getPlanRequests({
+        page: Number(req.query.page) || 1,
+        limit: Number(req.query.limit) || 20,
+        status: req.query.status as string,
+      });
+      sendPaginated(res, result.items, {
+        page: result.page,
+        limit: result.pageSize,
+        totalItems: result.total,
+        totalPages: result.totalPages,
+        hasNext: result.page * result.pageSize < result.total,
+        hasPrevious: result.page > 1,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async approvePlanRequest(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const adminUserId = req.user!.id;
+      const { id } = req.params;
+      await this.service.approvePlanRequest(String(id), adminUserId);
+      sendSuccess(res, "Plan request approved.", null);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async rejectPlanRequest(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const adminUserId = req.user!.id;
+      const { id } = req.params;
+      await this.service.rejectPlanRequest(String(id), adminUserId);
+      sendSuccess(res, "Plan request rejected.", null);
+    } catch (error) {
+      next(error);
+    }
+  }
 }

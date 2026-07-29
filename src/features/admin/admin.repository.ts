@@ -460,6 +460,106 @@ export class AdminRepository {
       platform: process.platform,
     };
   }
+
+  async getPlanRequests(params: {
+    skip: number;
+    limit: number;
+    status?: string;
+  }): Promise<{ items: unknown[]; total: number }> {
+    const filter: Record<string, unknown> = {};
+    if (params.status) filter.status = params.status;
+
+    const total = await this.db
+      .collection(COLLECTIONS.PLAN_REQUESTS)
+      .countDocuments(filter);
+
+    const items = await this.db
+      .collection(COLLECTIONS.PLAN_REQUESTS)
+      .find(filter)
+      .sort({ createdAt: -1 })
+      .skip(params.skip)
+      .limit(params.limit)
+      .toArray();
+
+    return {
+      items: items.map((doc) => ({ ...doc, _id: doc._id.toString() })),
+      total,
+    };
+  }
+
+  async approvePlanRequest(requestId: string, adminUserId: string): Promise<void> {
+    const reqDoc = await this.db
+      .collection(COLLECTIONS.PLAN_REQUESTS)
+      .findOne({ _id: new ObjectId(requestId) });
+
+    if (!reqDoc) throw new Error("Plan change request not found.");
+
+    const now = new Date().toISOString();
+    const { storeId, userId, requestedPlan } = reqDoc;
+
+    await this.db.collection(COLLECTIONS.PLAN_REQUESTS).updateOne(
+      { _id: new ObjectId(requestId) },
+      { $set: { status: "approved", approvedBy: adminUserId, approvedAt: now, updatedAt: now } }
+    );
+
+    await this.db.collection(COLLECTIONS.STORES).updateOne(
+      { _id: new ObjectId(storeId) },
+      { $set: { plan: requestedPlan, updatedAt: now } }
+    );
+
+    await this.db.collection(COLLECTIONS.USERS).updateOne(
+      { _id: new ObjectId(userId) },
+      { $set: { plan: requestedPlan, updatedAt: now } }
+    );
+
+    const priceMap: Record<string, number> = { starter: 0, pro: 800, business: 1500 };
+    const price = priceMap[requestedPlan] ?? 0;
+
+    await this.db.collection(COLLECTIONS.SUBSCRIPTIONS).updateOne(
+      { storeId },
+      {
+        $set: {
+          plan: requestedPlan,
+          price,
+          updatedAt: now,
+        },
+      },
+      { upsert: true }
+    );
+
+    await this.db.collection(COLLECTIONS.ACTIVITY_LOGS).insertOne({
+      storeId,
+      userId: adminUserId,
+      action: "PLAN_REQUEST_APPROVED",
+      module: "admin",
+      description: `Plan upgrade request for store "${reqDoc.storeName}" approved. Upgraded to ${requestedPlan}.`,
+      createdAt: now,
+    });
+  }
+
+  async rejectPlanRequest(requestId: string, adminUserId: string): Promise<void> {
+    const reqDoc = await this.db
+      .collection(COLLECTIONS.PLAN_REQUESTS)
+      .findOne({ _id: new ObjectId(requestId) });
+
+    if (!reqDoc) throw new Error("Plan change request not found.");
+
+    const now = new Date().toISOString();
+
+    await this.db.collection(COLLECTIONS.PLAN_REQUESTS).updateOne(
+      { _id: new ObjectId(requestId) },
+      { $set: { status: "rejected", rejectedBy: adminUserId, rejectedAt: now, updatedAt: now } }
+    );
+
+    await this.db.collection(COLLECTIONS.ACTIVITY_LOGS).insertOne({
+      storeId: reqDoc.storeId,
+      userId: adminUserId,
+      action: "PLAN_REQUEST_REJECTED",
+      module: "admin",
+      description: `Plan request to ${reqDoc.requestedPlan} for store "${reqDoc.storeName}" was rejected.`,
+      createdAt: now,
+    });
+  }
 }
 
 let instance: AdminRepository | null = null;

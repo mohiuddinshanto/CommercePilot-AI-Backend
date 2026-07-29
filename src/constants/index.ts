@@ -218,6 +218,7 @@ export const COLLECTIONS = {
   NOTIFICATIONS: "notifications",
   REPORTS: "reports",
   SYSTEM_SETTINGS: "system_settings",
+  PLAN_REQUESTS: "plan_requests",
 } as const;
 
 export const DEFAULT_PAGE_SIZE = 20;

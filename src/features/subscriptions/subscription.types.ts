@@ -72,6 +72,6 @@ export interface BillingRecord {
 
 export const PLAN_PRICES: Record<SubscriptionPlan, Record<BillingCycle, number>> = {
   starter: { monthly: 0, yearly: 0 },
-  pro: { monthly: 29.99, yearly: 299.99 },
-  business: { monthly: 79.99, yearly: 799.99 },
+  pro: { monthly: 800, yearly: 8000 },
+  business: { monthly: 1500, yearly: 15000 },
 };

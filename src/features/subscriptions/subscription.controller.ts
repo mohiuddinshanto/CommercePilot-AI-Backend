@@ -102,4 +102,27 @@ export class SubscriptionController {
       next(error);
     }
   }
+
+  async requestPlanChange(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const storeId = getStoreId(req);
+      const userId = req.user!.id;
+      const { plan } = req.body;
+
+      const result = await this.service.requestPlanChange(storeId, userId, plan);
+      sendCreated(res, "Plan upgrade request submitted to Admin for approval.", result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getMyPlanRequest(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const storeId = getStoreId(req);
+      const result = await this.service.getMyPlanRequest(storeId);
+      sendSuccess(res, "Plan request retrieved.", result);
+    } catch (error) {
+      next(error);
+    }
+  }
 }

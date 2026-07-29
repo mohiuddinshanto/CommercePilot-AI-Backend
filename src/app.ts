@@ -79,6 +79,7 @@ export async function createApp(): Promise<express.Express> {
   const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 20,
+    skip: () => process.env.NODE_ENV === "test",
     message: {
       success: false,
       message: "Too many requests. Please try again later.",
@@ -91,6 +92,7 @@ export async function createApp(): Promise<express.Express> {
   const apiLimiter = rateLimit({
     windowMs: 60 * 1000,
     max: 100,
+    skip: () => process.env.NODE_ENV === "test",
     message: {
       success: false,
       message: "Too many API requests. Please try again later.",
@@ -103,6 +105,7 @@ export async function createApp(): Promise<express.Express> {
   const aiLimiter = rateLimit({
     windowMs: 60 * 1000,
     max: 15,
+    skip: () => process.env.NODE_ENV === "test",
     message: {
       success: false,
       message: "Too many AI requests. Please try again later.",

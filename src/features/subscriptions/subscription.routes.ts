@@ -90,4 +90,22 @@ router.get(
   (req, res, next) => getController().getBillingHistory(req, res, next)
 );
 
+router.post(
+  "/request-change",
+  requireAuth(),
+  requireStoreAccess(),
+  requireStoreApproved(),
+  requireRole("owner"),
+  (req, res, next) => getController().requestPlanChange(req, res, next)
+);
+
+router.get(
+  "/my-request",
+  requireAuth(),
+  requireStoreAccess(),
+  requireStoreApproved(),
+  requireRole("owner"),
+  (req, res, next) => getController().getMyPlanRequest(req, res, next)
+);
+
 export { router as subscriptionRoutes };

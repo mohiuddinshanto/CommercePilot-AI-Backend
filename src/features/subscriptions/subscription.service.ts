@@ -1,5 +1,7 @@
+import { ObjectId } from "mongodb";
 import { getSubscriptionRepository } from "./subscription.repository.js";
 import { getAuthRepository } from "../auth/auth.repository.js";
+import { getDatabase } from "../../config/database.js";
 import {
   SubscriptionDocument,
   SubscriptionPlan,
@@ -10,8 +12,8 @@ import {
   BillingRecord,
   PLAN_PRICES,
 } from "./subscription.types.js";
-import { PLAN_LIMITS, ACTIVITY_ACTION } from "../../constants/index.js";
-import { NotFoundError, BusinessRuleError, ConflictError } from "../../utils/error-handler.js";
+import { PLAN_LIMITS, ACTIVITY_ACTION, COLLECTIONS } from "../../constants/index.js";
+import { NotFoundError, BusinessRuleError, ConflictError, ValidationError } from "../../utils/error-handler.js";
 
 export class SubscriptionService {
   private repo = getSubscriptionRepository();
@@ -311,6 +313,66 @@ export class SubscriptionService {
     }
 
     return records;
+  }
+
+  async requestPlanChange(storeId: string, userId: string, requestedPlan: SubscriptionPlan): Promise<unknown> {
+    const validPlans: SubscriptionPlan[] = ["starter", "pro", "business"];
+    if (!requestedPlan || !validPlans.includes(requestedPlan)) {
+      throw new ValidationError("Validation failed.", [
+        { field: "plan", message: "Plan must be one of: starter, pro, business." },
+      ]);
+    }
+
+    const db = getDatabase();
+    const store = await db.collection(COLLECTIONS.STORES).findOne({ _id: new ObjectId(storeId) });
+    const user = await db.collection(COLLECTIONS.USERS).findOne({ _id: new ObjectId(userId) });
+    const currentSub = await this.repo.findByStoreId(storeId);
+    const currentPlan = currentSub?.plan || store?.plan || "starter";
+
+    if (requestedPlan === currentPlan) {
+      throw new BusinessRuleError(`You are already on the ${requestedPlan} plan.`);
+    }
+
+    const now = new Date().toISOString();
+    const existing = await db.collection(COLLECTIONS.PLAN_REQUESTS).findOne({ storeId, status: "pending" });
+    if (existing) {
+      throw new ConflictError("You already have a pending plan change request waiting for Admin approval.");
+    }
+
+    const doc = {
+      _id: new ObjectId(),
+      storeId,
+      userId,
+      storeName: store?.storeName || "My Store",
+      userName: user?.name || "Store Owner",
+      userEmail: user?.email || "",
+      currentPlan: currentSub?.plan || store?.plan || "starter",
+      requestedPlan,
+      status: "pending",
+      requestedAt: now,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    await db.collection(COLLECTIONS.PLAN_REQUESTS).insertOne(doc);
+
+    await this.authRepository.createActivityLog({
+      storeId,
+      userId,
+      action: "PLAN_CHANGE_REQUESTED",
+      module: "subscriptions",
+      description: `Requested plan change to ${requestedPlan}.`,
+      createdAt: now,
+    });
+
+    return { ...doc, _id: doc._id.toString() };
+  }
+
+  async getMyPlanRequest(storeId: string): Promise<unknown> {
+    const db = getDatabase();
+    const req = await db.collection(COLLECTIONS.PLAN_REQUESTS).findOne({ storeId, status: "pending" });
+    if (!req) return null;
+    return { ...req, _id: req._id.toString() };
   }
 
   private getPlanLimits(plan: SubscriptionPlan): SubscriptionLimits {

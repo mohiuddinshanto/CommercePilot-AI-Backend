@@ -11,11 +11,9 @@ import { reportRoutes } from "../features/reports/reports.routes.js";
 import { aiRoutes } from "../features/ai/ai.routes.js";
 import { subscriptionRoutes } from "../features/subscriptions/subscription.routes.js";
 import { adminRoutes } from "../features/admin/admin.routes.js";
-import { publicProductRoutes } from "../features/products/public-products.routes.js";
 import { dashboardRoutes } from "../features/dashboard/dashboard.routes.js";
 
 const router = Router();
-router.use("/public/products", publicProductRoutes);
 
 router.use("/auth", authRoutes);
 router.use("/products", productRoutes);
