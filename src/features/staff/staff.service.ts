@@ -8,6 +8,8 @@ import { ACTIVITY_ACTION } from "../../constants/index.js";
 import { PLAN_LIMITS } from "../../constants/index.js";
 import { getSubscriptionService } from "../subscriptions/subscription.service.js";
 import { EMAIL_REGEX } from "../../utils/helpers.js";
+import { sendEmail } from "../../utils/email.js";
+import { buildStaffInviteEmail } from "./staff.email.js";
 
 export class StaffService {
   private staffRepo = getStaffRepository();
@@ -102,6 +104,28 @@ export class StaffService {
     });
 
     await this.subscriptionService.incrementUsage(storeId, "staff").catch(() => {});
+
+    // Send invitation email (non-blocking — invite still succeeds if email fails)
+    try {
+      const inviter = await this.authRepository.findUserById(userId);
+      const inviterName = inviter?.name || inviter?.email || "Your store owner";
+      const storeName = store.storeName || "your store";
+
+      const mailOptions = buildStaffInviteEmail({
+        staffName: name,
+        staffEmail: email,
+        storeName,
+        inviterName,
+        role: input.role || "cashier",
+        invitationToken,
+      });
+
+      await sendEmail(mailOptions);
+    } catch (emailErr) {
+      // Log but don't fail the invite request
+      const msg = emailErr instanceof Error ? emailErr.message : String(emailErr);
+      console.error(`[Staff Invite] Email delivery failed: ${msg}`);
+    }
 
     return staff;
   }
