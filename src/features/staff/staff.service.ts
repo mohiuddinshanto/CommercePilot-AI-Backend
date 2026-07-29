@@ -155,6 +155,9 @@ export class StaffService {
       throw new NotFoundError("Staff member");
     }
 
+    // Link user to the store and assign staff role
+    await this.authRepository.updateUserStaffInfo(userId, staff.storeId);
+
     await this.authRepository.createActivityLog({
       storeId: staff.storeId,
       userId,

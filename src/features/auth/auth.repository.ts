@@ -53,6 +53,22 @@ export class AuthRepository {
       );
   }
 
+  async updateUserStaffInfo(userId: string, storeId: string): Promise<void> {
+    await this.db
+      .collection<UserDocument>(COLLECTIONS.USERS)
+      .updateOne(
+        { _id: new ObjectId(userId) },
+        {
+          $set: {
+            storeId,
+            role: "staff",
+            accountStatus: "approved",
+            updatedAt: new Date().toISOString(),
+          },
+        }
+      );
+  }
+
   async updateUserAccountStatus(
     userId: string,
     status: string

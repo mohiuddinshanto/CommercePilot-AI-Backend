@@ -48,7 +48,6 @@ router.post(
 router.post(
   "/accept",
   requireAuth(),
-  requireStoreAccess(),
   validateAcceptInvitation,
   (req, res, next) => getController().accept(req, res, next)
 );
