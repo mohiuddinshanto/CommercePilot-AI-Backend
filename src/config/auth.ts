@@ -30,6 +30,8 @@ export function getAuth(): AuthInstance {
       logger.warn("[Auth] Google social provider DISABLED — missing GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET");
     }
 
+    const isProduction = environment.NODE_ENV === "production";
+
     const auth = betterAuth({
       database: mongodbAdapter(db),
       secret: environment.BETTER_AUTH_SECRET,
@@ -37,9 +39,9 @@ export function getAuth(): AuthInstance {
       trustedOrigins: environment.CLIENT_ORIGINS,
       advanced: {
         defaultCookieAttributes: {
-          sameSite: "none",
-          secure: true,
-          partitioned: true,
+          sameSite: isProduction ? "none" : "lax",
+          secure: isProduction,
+          ...(isProduction ? { partitioned: true } : {}),
         },
       },
       account: {
