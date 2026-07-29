@@ -80,6 +80,9 @@ export class AdminService {
 
     const isActive = input.status === "approved";
     await this.repo.updateStoreStatus(id, input.status, isActive);
+    if (store.ownerId) {
+      await this.repo.updateUserStatus(store.ownerId, input.status);
+    }
 
     await this.authRepo.createActivityLog({
       storeId: id,
@@ -131,6 +134,11 @@ export class AdminService {
     userId: string
   ): Promise<void> {
     await this.repo.updateUserStatus(id, input.status);
+
+    const user = await this.authRepo.findUserById(id);
+    if (user && user.storeId) {
+      await this.repo.updateStoreStatus(user.storeId, input.status, input.status === "approved");
+    }
 
     const actionMap: Record<string, string> = {
       approved: "USER_APPROVED",
