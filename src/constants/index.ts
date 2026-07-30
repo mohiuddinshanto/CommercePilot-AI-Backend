@@ -109,6 +109,12 @@ export const RETURN_STATUS = {
   COMPLETED: "completed",
 } as const;
 
+export const RETURN_TYPE = {
+  REFUND: "refund",
+  SAME_EXCHANGE: "same_exchange",
+  DIFFERENT_EXCHANGE: "different_exchange",
+} as const;
+
 export const REPORT_TYPE = {
   DAILY: "daily",
   WEEKLY: "weekly",

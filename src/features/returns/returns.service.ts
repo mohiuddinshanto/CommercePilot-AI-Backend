@@ -9,7 +9,7 @@ import { getBundleRepository } from "../bundles/bundles.repository.js";
 import { getAuthRepository } from "../auth/auth.repository.js";
 import { NotFoundError, BusinessRuleError, ValidationError } from "../../utils/error-handler.js";
 import { parsePaginationParams } from "../../utils/pagination.js";
-import { ACTIVITY_ACTION, RETURN_STATUS } from "../../constants/index.js";
+import { ACTIVITY_ACTION, RETURN_STATUS, RETURN_TYPE } from "../../constants/index.js";
 import { restoreInventory } from "../shared/inventory-restore.js";
 import { roundCurrency } from "../../utils/helpers.js";
 
@@ -138,6 +138,14 @@ export class ReturnService {
     userId: string,
     input: CreateReturnInput
   ): Promise<ReturnDocument> {
+    const returnType: string = input.returnType || RETURN_TYPE.REFUND;
+    const allowedTypes = Object.values(RETURN_TYPE);
+    if (!allowedTypes.includes(returnType as never)) {
+      throw new ValidationError("Validation failed.", [
+        { field: "returnType", message: `Return type must be one of: ${allowedTypes.join(", ")}.` },
+      ]);
+    }
+
     const sale = await this.validateReturnItems(storeId, input.saleId, input.items);
 
     const { subtotal, refundAmount } = await this.calculateRefundAmount(
@@ -148,6 +156,14 @@ export class ReturnService {
 
     if (refundAmount > sale.grandTotal) {
       throw new BusinessRuleError("Refund amount cannot exceed sale grand total.");
+    }
+
+    let exchangeTotal = 0;
+    let adjustmentAmount = 0;
+
+    if (returnType === RETURN_TYPE.DIFFERENT_EXCHANGE && input.exchangeItems && input.exchangeItems.length > 0) {
+      exchangeTotal = input.exchangeItems.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
+      adjustmentAmount = roundCurrency(exchangeTotal - refundAmount);
     }
 
     const now = new Date().toISOString();
@@ -166,6 +182,7 @@ export class ReturnService {
           customerId: sale.customerId || null,
           customerName: sale.customerName,
           customerPhone: sale.customerPhone || null,
+          returnType,
           items: input.items.map((item) => ({
             ...(item.productId ? { productId: new ObjectId(item.productId) } : {}),
             ...(item.bundleId ? { bundleId: new ObjectId(item.bundleId) } : {}),
@@ -175,6 +192,18 @@ export class ReturnService {
           })),
           subtotal,
           refundAmount,
+          exchangeItems: returnType === RETURN_TYPE.DIFFERENT_EXCHANGE && input.exchangeItems
+            ? input.exchangeItems.map((ei) => ({
+                productId: ei.productId,
+                name: ei.name,
+                sku: ei.sku,
+                quantity: ei.quantity,
+                unitPrice: ei.unitPrice,
+                totalPrice: roundCurrency(ei.quantity * ei.unitPrice),
+              }))
+            : undefined,
+          exchangeTotal: exchangeTotal > 0 ? exchangeTotal : undefined,
+          adjustmentAmount: returnType === RETURN_TYPE.DIFFERENT_EXCHANGE ? adjustmentAmount : undefined,
           status: RETURN_STATUS.PENDING,
           reason: input.reason?.trim() || "",
           notes: input.notes?.trim() || "",
@@ -212,12 +241,66 @@ export class ReturnService {
           await this.inventoryRepo.createMovement(movement);
         }
 
+        if (returnType === RETURN_TYPE.DIFFERENT_EXCHANGE && input.exchangeItems && input.exchangeItems.length > 0) {
+          for (const exItem of input.exchangeItems) {
+            const product = await this.productRepo.findByIdAndStoreId(exItem.productId, storeId);
+            if (!product) {
+              throw new NotFoundError(`Exchange product ${exItem.name} not found.`);
+            }
+
+            const invs = await this.inventoryRepo.findByProductIds(
+              new ObjectId(storeId),
+              [new ObjectId(exItem.productId)]
+            );
+            const inv = invs.length > 0 ? invs[0] : null;
+            if (!inv) {
+              throw new NotFoundError(`Inventory for product ${exItem.name} not found.`);
+            }
+            if (inv.currentStock < exItem.quantity) {
+              throw new BusinessRuleError(`Insufficient stock for "${exItem.name}". Available: ${inv.currentStock}, needed: ${exItem.quantity}.`);
+            }
+
+            const newStock = product.stock - exItem.quantity;
+            await this.productRepo.update(exItem.productId, storeId, { stock: newStock });
+
+            await this.inventoryRepo.update(inv._id, new ObjectId(storeId), {
+              $set: {
+                currentStock: newStock,
+                availableStock: newStock - inv.reservedStock,
+              },
+            });
+
+            await this.inventoryRepo.createMovement({
+              storeId: new ObjectId(storeId),
+              inventoryId: inv._id,
+              productId: new ObjectId(exItem.productId),
+              type: "return",
+              quantity: -exItem.quantity,
+              previousStock: product.stock,
+              newStock,
+              reference: returnDoc!._id.toString(),
+              notes: `Exchange - return ${returnDoc!.invoiceNumber}`,
+              createdBy: new ObjectId(userId),
+            });
+          }
+        }
+
+        const descParts = [`Return created for invoice ${sale.invoiceNumber}`];
+        if (returnType === RETURN_TYPE.REFUND) {
+          descParts.push(`Refund: $${refundAmount}.`);
+        } else if (returnType === RETURN_TYPE.SAME_EXCHANGE) {
+          descParts.push(`Same product exchange. Refund: $${refundAmount}.`);
+        } else if (returnType === RETURN_TYPE.DIFFERENT_EXCHANGE) {
+          const adj = adjustmentAmount >= 0 ? `Customer pays $${Math.abs(adjustmentAmount)}` : `Refund $${Math.abs(adjustmentAmount)}`;
+          descParts.push(`Different product exchange. ${adj}.`);
+        }
+
         await this.authRepository.createActivityLog({
           storeId,
           userId,
           action: ACTIVITY_ACTION.CREATE_RETURN,
           module: "returns",
-          description: `Return created for invoice ${sale.invoiceNumber}. Refund: $${refundAmount}.`,
+          description: descParts.join(" "),
           createdAt: now,
         });
       });
