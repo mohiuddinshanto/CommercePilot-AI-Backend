@@ -7,7 +7,7 @@ import { getInventoryRepository } from "../inventory/inventory.repository.js";
 import { getBundleRepository } from "../bundles/bundles.repository.js";
 import { NotFoundError, BusinessRuleError, ValidationError } from "../../utils/error-handler.js";
 import { parsePaginationParams } from "../../utils/pagination.js";
-import { ACTIVITY_ACTION, PAYMENT_STATUS, SALE_STATUS } from "../../constants/index.js";
+import { ACTIVITY_ACTION, PAYMENT_METHOD, PAYMENT_STATUS, SALE_STATUS } from "../../constants/index.js";
 import { getAuthRepository } from "../auth/auth.repository.js";
 import { restoreInventory } from "../shared/inventory-restore.js";
 import { roundCurrency } from "../../utils/helpers.js";
@@ -287,7 +287,7 @@ export class SaleService {
       ]);
     }
 
-    const allowedMethods = ["cash", "card", "mobile_banking", "bank_transfer"];
+    const allowedMethods = Object.values(PAYMENT_METHOD) as string[];
     if (!allowedMethods.includes(input.paymentMethod)) {
       throw new ValidationError("Validation failed.", [
         { field: "paymentMethod", message: `Payment method must be one of: ${allowedMethods.join(", ")}.` },
@@ -390,6 +390,7 @@ export class SaleService {
           paidAmount: input.paidAmount,
           dueAmount,
           paymentMethod: input.paymentMethod,
+          paymentNote: input.paymentNote?.trim() || "",
           paymentStatus,
           status: SALE_STATUS.COMPLETED,
           notes: input.notes?.trim() || "",
@@ -496,6 +497,9 @@ export class SaleService {
     }
     if (input.paymentMethod !== undefined) {
       updateData.paymentMethod = input.paymentMethod;
+    }
+    if (input.paymentNote !== undefined) {
+      updateData.paymentNote = input.paymentNote?.trim() || "";
     }
     if (input.paymentStatus !== undefined) {
       updateData.paymentStatus = input.paymentStatus;

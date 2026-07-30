@@ -82,8 +82,10 @@ export const INVENTORY_TYPE = {
 
 export const PAYMENT_METHOD = {
   CASH: "cash",
+  BKASH: "bkash",
+  NAGAD: "nagad",
+  ROCKET: "rocket",
   CARD: "card",
-  MOBILE_BANKING: "mobile_banking",
   BANK_TRANSFER: "bank_transfer",
 } as const;
 
