@@ -227,6 +227,24 @@ export const COLLECTIONS = {
   REPORTS: "reports",
   SYSTEM_SETTINGS: "system_settings",
   PLAN_REQUESTS: "plan_requests",
+  SHIPMENTS: "shipments",
+} as const;
+
+export const SHIPMENT_STATUS = {
+  PENDING: "pending",
+  PICKED: "picked",
+  IN_TRANSIT: "in_transit",
+  DELIVERED: "delivered",
+  RETURNED: "returned",
+  CANCELLED: "cancelled",
+} as const;
+
+export const COURIER_NAMES = {
+  STEADFAST: "steadfast",
+  PATHAO: "pathao",
+  REDX: "redx",
+  ECOURIER: "ecourier",
+  MANUAL: "manual",
 } as const;
 
 export const DEFAULT_PAGE_SIZE = 20;

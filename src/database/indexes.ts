@@ -76,6 +76,11 @@ const INDEXES: IndexDefinition[] = [
   // ── customers ──
   { collection: COLLECTIONS.CUSTOMERS, index: { storeId: 1, phone: 1 } },
   { collection: COLLECTIONS.CUSTOMERS, index: { storeId: 1, email: 1 } },
+
+  // ── shipments ──
+  { collection: COLLECTIONS.SHIPMENTS, index: { storeId: 1, createdAt: -1 } },
+  { collection: COLLECTIONS.SHIPMENTS, index: { storeId: 1, saleId: 1 } },
+  { collection: COLLECTIONS.SHIPMENTS, index: { courier: 1, consignmentId: 1 } },
 ];
 
 export async function ensureIndexes(db: Db): Promise<void> {
