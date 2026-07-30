@@ -9,7 +9,7 @@ import { getBundleRepository } from "../bundles/bundles.repository.js";
 import { getAuthRepository } from "../auth/auth.repository.js";
 import { NotFoundError, BusinessRuleError, ValidationError } from "../../utils/error-handler.js";
 import { parsePaginationParams } from "../../utils/pagination.js";
-import { ACTIVITY_ACTION, RETURN_STATUS, RETURN_TYPE } from "../../constants/index.js";
+import { ACTIVITY_ACTION, RETURN_STATUS, RETURN_TYPE, SALE_STATUS } from "../../constants/index.js";
 import { restoreInventory } from "../shared/inventory-restore.js";
 import { roundCurrency } from "../../utils/helpers.js";
 
@@ -395,6 +395,10 @@ export class ReturnService {
       throw new NotFoundError("Return not found.");
     }
 
+    if (input.status === RETURN_STATUS.APPROVED && existing.status === RETURN_STATUS.PENDING) {
+      await this.adjustSaleOnReturnApproval(storeId, userId, existing);
+    }
+
     let activityAction: string = ACTIVITY_ACTION.UPDATE_RETURN;
     if (input.status === RETURN_STATUS.APPROVED) {
       activityAction = ACTIVITY_ACTION.APPROVE_RETURN;
@@ -407,11 +411,87 @@ export class ReturnService {
       userId,
       action: activityAction,
       module: "returns",
-      description: `Return ${updated.invoiceNumber} updated. Status: ${updated.status}.`,
+      description: input.status === RETURN_STATUS.APPROVED
+        ? `Return ${updated.invoiceNumber} approved. Refund: $${updated.refundAmount}. Sale adjusted.`
+        : `Return ${updated.invoiceNumber} updated. Status: ${updated.status}.`,
       createdAt: new Date().toISOString(),
     });
 
     return updated;
+  }
+
+  private async adjustSaleOnReturnApproval(
+    storeId: string,
+    _userId: string,
+    returnDoc: ReturnDocument
+  ): Promise<void> {
+    const sale = await this.saleRepo.findByIdAndStoreId(returnDoc.saleId.toString(), storeId);
+    if (!sale) {
+      throw new NotFoundError("Sale not found for return adjustment.");
+    }
+
+    const originalSubtotal = sale.subtotal;
+    const originalDiscount = sale.discount;
+    const originalItems = [...sale.items];
+
+    const returnedQtyMap = new Map<string, number>();
+    for (const item of returnDoc.items) {
+      const key = item.productId
+        ? `product_${item.productId.toString()}`
+        : item.bundleId
+          ? `bundle_${item.bundleId.toString()}`
+          : "";
+      if (key) {
+        returnedQtyMap.set(key, (returnedQtyMap.get(key) || 0) + item.quantity);
+      }
+    }
+
+    const newItems = originalItems
+      .map((si) => {
+        const key = si.productId
+          ? `product_${si.productId.toString()}`
+          : si.bundleId
+            ? `bundle_${si.bundleId.toString()}`
+            : "";
+        const returnQty = returnedQtyMap.get(key) || 0;
+        if (returnQty === 0) return si;
+
+        const newQty = si.quantity - returnQty;
+        if (newQty <= 0) return null;
+
+        const totalPrice = roundCurrency(newQty * si.unitPrice);
+        return { ...si, quantity: newQty, totalPrice };
+      })
+      .filter((item): item is NonNullable<typeof item> => item !== null);
+
+    const newSubtotal = roundCurrency(newItems.reduce((sum, item) => sum + item.totalPrice, 0));
+
+    let newDiscount = 0;
+    if (originalSubtotal > 0) {
+      newDiscount = roundCurrency((newSubtotal / originalSubtotal) * originalDiscount);
+    }
+
+    const newGrandTotal = roundCurrency(newSubtotal - newDiscount + sale.tax + sale.shipping);
+
+    let newPaidAmount = sale.paidAmount;
+    let newDueAmount = newGrandTotal - newPaidAmount;
+    if (newDueAmount < 0) {
+      newPaidAmount = newGrandTotal;
+      newDueAmount = 0;
+    }
+
+    const allReturned = newItems.length === 0;
+
+    await this.saleRepo.update(sale._id.toString(), storeId, {
+      items: newItems,
+      subtotal: newSubtotal,
+      discount: newDiscount,
+      grandTotal: newGrandTotal,
+      paidAmount: newPaidAmount,
+      dueAmount: newDueAmount,
+      status: allReturned ? SALE_STATUS.REFUNDED : sale.status,
+    });
+
   }
 
   async deleteReturn(
