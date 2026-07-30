@@ -70,6 +70,7 @@ export interface TopCustomerData {
 
 export interface BestCashierData {
   createdBy: string;
+  cashierName: string;
   totalSales: number;
   totalRevenue: number;
   avgSaleValue: number;

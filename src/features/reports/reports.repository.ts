@@ -328,10 +328,35 @@ export class ReportsRepository {
           $project: {
             _id: 0,
             categoryId: "$_id",
-            categoryName: { $cond: [{ $eq: ["$_id", "uncategorized"] }, "Uncategorized", "$_id"] },
+            categoryNameRaw: { $cond: [{ $eq: ["$_id", "uncategorized"] }, "Uncategorized", "$_id"] },
+            isUncategorized: { $eq: ["$_id", "uncategorized"] },
             totalQuantitySold: 1,
             totalRevenue: 1,
             productCount: { $size: "$productIds" },
+          },
+        },
+        {
+          $lookup: {
+            from: COLLECTIONS.CATEGORIES,
+            localField: "categoryId",
+            foreignField: "_id",
+            as: "category",
+          },
+        },
+        { $unwind: { path: "$category", preserveNullAndEmptyArrays: true } },
+        {
+          $project: {
+            categoryId: 1,
+            categoryName: {
+              $cond: [
+                "$isUncategorized",
+                "Uncategorized",
+                { $ifNull: ["$category.name", "$categoryNameRaw"] },
+              ],
+            },
+            totalQuantitySold: 1,
+            totalRevenue: 1,
+            productCount: 1,
           },
         },
         { $sort: { totalRevenue: -1 } },
@@ -339,7 +364,7 @@ export class ReportsRepository {
       ])
       .toArray();
 
-    return (result as unknown as { categoryId: string; categoryName: string; totalQuantitySold: number; totalRevenue: number; productCount: number }[]).map(
+    return (result as unknown as TopCategoryData[]).map(
       (r) => ({
         categoryId: r.categoryId,
         categoryName: r.categoryName,
@@ -419,9 +444,21 @@ export class ReportsRepository {
           },
         },
         {
+          $lookup: {
+            from: COLLECTIONS.USERS,
+            localField: "_id",
+            foreignField: "_id",
+            as: "user",
+          },
+        },
+        { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+        {
           $project: {
             _id: 0,
             createdBy: "$_id",
+            cashierName: {
+              $ifNull: ["$user.name", "$user.email", "$_id"],
+            },
             totalSales: 1,
             totalRevenue: 1,
             avgSaleValue: { $divide: ["$totalRevenue", "$totalSales"] },
@@ -432,9 +469,10 @@ export class ReportsRepository {
       ])
       .toArray();
 
-    return (result as unknown as { createdBy: string; totalSales: number; totalRevenue: number; avgSaleValue: number }[]).map(
+    return (result as unknown as BestCashierData[]).map(
       (r) => ({
         createdBy: r.createdBy,
+        cashierName: r.cashierName,
         totalSales: r.totalSales,
         totalRevenue: Math.round(r.totalRevenue * 100) / 100,
         avgSaleValue: Math.round(r.avgSaleValue * 100) / 100,
