@@ -23,6 +23,9 @@ export const environment = {
     ...parseOrigins(additionalOriginsRaw),
   ],
   GROQ_API_KEY: process.env.GROQ_API_KEY || "",
+  META_APP_ID: process.env.META_APP_ID || "",
+  META_APP_SECRET: process.env.META_APP_SECRET || "",
+  META_WEBHOOK_VERIFY_TOKEN: process.env.META_WEBHOOK_VERIFY_TOKEN || "",
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || "",
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || "",
   // Email (nodemailer)

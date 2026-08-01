@@ -81,6 +81,21 @@ const INDEXES: IndexDefinition[] = [
   { collection: COLLECTIONS.SHIPMENTS, index: { storeId: 1, createdAt: -1 } },
   { collection: COLLECTIONS.SHIPMENTS, index: { storeId: 1, saleId: 1 } },
   { collection: COLLECTIONS.SHIPMENTS, index: { courier: 1, consignmentId: 1 } },
+
+  // ── social connections ──
+  { collection: COLLECTIONS.SOCIAL_CONNECTIONS, index: { storeId: 1, isDeleted: 1, createdAt: -1 } },
+  { collection: COLLECTIONS.SOCIAL_CONNECTIONS, index: { storeId: 1, pageId: 1, isDeleted: 1 }, options: { unique: true, sparse: true } },
+  { collection: COLLECTIONS.SOCIAL_CONNECTIONS, index: { pageId: 1, isDeleted: 1, active: 1 } },
+
+  // ── inbox conversations ──
+  { collection: COLLECTIONS.INBOX_CONVERSATIONS, index: { storeId: 1, isDeleted: 1, lastMessageAt: -1 } },
+  { collection: COLLECTIONS.INBOX_CONVERSATIONS, index: { storeId: 1, connectionId: 1, lastMessageAt: -1 } },
+  { collection: COLLECTIONS.INBOX_CONVERSATIONS, index: { storeId: 1, connectionId: 1, participantId: 1, isDeleted: 1 }, options: { unique: true, sparse: true } },
+  { collection: COLLECTIONS.INBOX_CONVERSATIONS, index: { storeId: 1, status: 1, lastMessageAt: -1 } },
+
+  // ── inbox messages ──
+  { collection: COLLECTIONS.INBOX_MESSAGES, index: { storeId: 1, conversationId: 1, createdAt: 1 } },
+  { collection: COLLECTIONS.INBOX_MESSAGES, index: { storeId: 1, direction: 1, repliedBy: 1, createdAt: -1 } },
 ];
 
 export async function ensureIndexes(db: Db): Promise<void> {

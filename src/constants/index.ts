@@ -190,6 +190,12 @@ export const ACTIVITY_ACTION = {
   USER_ACTIVATED: "USER_ACTIVATED",
   SUBSCRIPTION_UPDATED: "SUBSCRIPTION_UPDATED",
   SYSTEM_SETTING_UPDATED: "SYSTEM_SETTING_UPDATED",
+  CONNECT_PAGE: "CONNECT_PAGE",
+  DISCONNECT_PAGE: "DISCONNECT_PAGE",
+  UPDATE_PAGE: "UPDATE_PAGE",
+  SEND_MESSAGE: "SEND_MESSAGE",
+  ASSIGN_CONVERSATION: "ASSIGN_CONVERSATION",
+  UPDATE_CONVERSATION: "UPDATE_CONVERSATION",
 } as const;
 
 export const STAFF_PERMISSIONS = {
@@ -203,6 +209,7 @@ export const STAFF_PERMISSIONS = {
   STAFF: "staff",
   SETTINGS: "settings",
   AI: "ai",
+  INBOX: "inbox",
 } as const;
 
 export const COLLECTIONS = {
@@ -228,6 +235,24 @@ export const COLLECTIONS = {
   SYSTEM_SETTINGS: "system_settings",
   PLAN_REQUESTS: "plan_requests",
   SHIPMENTS: "shipments",
+  SOCIAL_CONNECTIONS: "social_connections",
+  INBOX_CONVERSATIONS: "inbox_conversations",
+  INBOX_MESSAGES: "inbox_messages",
+} as const;
+
+export const SOCIAL_PLATFORM = {
+  FACEBOOK: "facebook",
+  INSTAGRAM: "instagram",
+} as const;
+
+export const INBOX_CONVERSATION_STATUS = {
+  OPEN: "open",
+  CLOSED: "closed",
+} as const;
+
+export const MESSAGE_DIRECTION = {
+  INBOUND: "inbound",
+  OUTBOUND: "outbound",
 } as const;
 
 export const SHIPMENT_STATUS = {

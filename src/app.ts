@@ -8,6 +8,7 @@ import { environment, validateEnvironment } from "./config/environment.js";
 import { connectDatabase, getDatabase } from "./config/database.js";
 import { getAuth } from "./config/auth.js";
 import { apiRoutes } from "./routes/index.js";
+import { getInboxController } from "./features/inbox/inbox.controller.js";
 import { errorHandler, notFoundHandler } from "./middleware/error.middleware.js";
 
 const SHUTDOWN_TIMEOUT_MS = 30_000;
@@ -49,6 +50,15 @@ export async function createApp(): Promise<express.Express> {
   }));
 
   app.use(compression());
+
+  // Meta Messenger/Instagram webhook — must be registered before express.json()
+  // so the raw body is preserved for signature verification.
+  app.get("/webhook/meta", (req, res, next) => getInboxController().verifyWebhook(req, res, next));
+  app.post(
+    "/webhook/meta",
+    express.raw({ type: "application/json" }),
+    (req, res, next) => getInboxController().receiveWebhook(req, res, next)
+  );
 
   app.use(express.json({ limit: "10mb" }));
   app.use(express.urlencoded({ extended: true }));

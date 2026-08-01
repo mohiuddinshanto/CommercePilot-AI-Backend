@@ -11,6 +11,7 @@ import { reportRoutes } from "../features/reports/reports.routes.js";
 import { aiRoutes } from "../features/ai/ai.routes.js";
 import { subscriptionRoutes } from "../features/subscriptions/subscription.routes.js";
 import { shipmentRoutes } from "../features/shipments/shipments.routes.js";
+import { inboxRoutes } from "../features/inbox/inbox.routes.js";
 import { adminRoutes } from "../features/admin/admin.routes.js";
 import { dashboardRoutes } from "../features/dashboard/dashboard.routes.js";
 
@@ -30,5 +31,6 @@ router.use("/subscriptions", subscriptionRoutes);
 router.use("/admin", adminRoutes);
 router.use("/dashboard", dashboardRoutes);
 router.use("/shipments", shipmentRoutes);
+router.use("/inbox", inboxRoutes);
 
 export { router as apiRoutes };
