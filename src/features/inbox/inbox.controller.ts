@@ -151,6 +151,17 @@ export class InboxController {
   async receiveWebhook(req: Request, res: Response, _next: NextFunction): Promise<void> {
     try {
       const rawBody = req.body as unknown;
+      const rawBuffer = Buffer.isBuffer(rawBody) ? rawBody : Buffer.from(
+        typeof rawBody === "string" ? rawBody : JSON.stringify(rawBody || {}),
+        "utf8"
+      );
+
+      const signature = req.headers["x-hub-signature-256"] as string | undefined;
+      if (!this.service.verifyWebhookSignature(rawBuffer, signature)) {
+        res.status(403).send("SIGNATURE_MISMATCH");
+        return;
+      }
+
       let payload: Record<string, unknown> = {};
       if (Buffer.isBuffer(rawBody)) {
         payload = JSON.parse(rawBody.toString("utf8"));
@@ -159,6 +170,7 @@ export class InboxController {
       } else if (rawBody && typeof rawBody === "object") {
         payload = rawBody as Record<string, unknown>;
       }
+
       await this.service.handleWebhookEvent(payload);
       res.status(200).send("EVENT_RECEIVED");
     } catch (error) {

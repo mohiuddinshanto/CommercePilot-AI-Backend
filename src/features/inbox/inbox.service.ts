@@ -1,3 +1,4 @@
+import { createHmac } from "crypto";
 import { getInboxRepository } from "./inbox.repository.js";
 import { getAuthRepository } from "../auth/auth.repository.js";
 import {
@@ -55,11 +56,29 @@ export class InboxService {
   }
 
   private async verifyPageToken(pageId: string, token: string): Promise<{ id: string; name: string }> {
-    const data = await this.callGraphApi(`/${pageId}`, "GET", {
-      fields: "id,name",
-      access_token: token,
+    const appId = process.env.META_APP_ID || "";
+    const appSecret = process.env.META_APP_SECRET || "";
+    if (!appId || !appSecret) {
+      throw new BusinessRuleError("Meta app credentials (META_APP_ID, META_APP_SECRET) are not configured on the server.");
+    }
+
+    const appToken = `${appId}|${appSecret}`;
+    const data = await this.callGraphApi("/debug_token", "GET", {
+      input_token: token,
+      access_token: appToken,
     });
-    return { id: String(data.id), name: String(data.name || pageId) };
+
+    const info = (data.data as Record<string, unknown>) || {};
+    if (info.is_valid !== true || info.type !== "PAGE") {
+      throw new BusinessRuleError("The provided token is not a valid Facebook Page Access Token.");
+    }
+
+    const resolvedPageId = String(info.profile_id || "");
+    if (resolvedPageId !== pageId) {
+      throw new BusinessRuleError("The token does not belong to the page ID you provided.");
+    }
+
+    return { id: resolvedPageId, name: "" };
   }
 
   private async getUserProfile(pageAccessToken: string, psid: string): Promise<{ name: string; profilePic?: string }> {
@@ -111,7 +130,7 @@ export class InboxService {
       storeId,
       platform: input.platform,
       pageId: verified.id,
-      pageName: input.pageName || verified.name,
+      pageName: input.pageName || verified.id,
       pageAccessToken: input.pageAccessToken,
       active: true,
       connectedBy: userId,
@@ -124,7 +143,10 @@ export class InboxService {
 
     // Subscribe the page to our webhook so incoming messages are delivered.
     try {
-      await this.callGraphApi(`/${verified.id}/subscribed_apps`, "POST", { access_token: input.pageAccessToken });
+      await this.callGraphApi(`/${verified.id}/subscribed_apps`, "POST", {
+        access_token: input.pageAccessToken,
+        subscribed_fields: "messages",
+      });
     } catch (error) {
       logger.warn("Failed to subscribe page to webhook", error);
     }
@@ -414,6 +436,21 @@ export class InboxService {
       return String(challenge);
     }
     throw new BusinessRuleError("Webhook verification failed.");
+  }
+
+  verifyWebhookSignature(rawBody: Buffer, signatureHeader: string | undefined): boolean {
+    const appSecret = process.env.META_APP_SECRET || "";
+    if (!appSecret || !signatureHeader) return false;
+
+    const expected = `sha256=${createHmac("sha256", appSecret).update(rawBody).digest("hex")}`;
+    const received = String(signatureHeader);
+    if (expected.length !== received.length) return false;
+
+    let diff = 0;
+    for (let i = 0; i < expected.length; i++) {
+      diff |= expected.charCodeAt(i) ^ received.charCodeAt(i);
+    }
+    return diff === 0;
   }
 
   async handleWebhookEvent(payload: Record<string, unknown>): Promise<void> {
