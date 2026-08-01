@@ -70,7 +70,13 @@ export class InboxService {
 
     const info = (data.data as Record<string, unknown>) || {};
     if (info.is_valid !== true || info.type !== "PAGE") {
-      throw new BusinessRuleError("The provided token is not a valid Facebook Page Access Token.");
+      const expiresAt = Number(info.expires_at || 0);
+      const expiryText = expiresAt === 0 ? "never" : new Date(expiresAt * 1000).toISOString();
+      throw new BusinessRuleError(
+        `The provided token is not a valid Facebook Page Access Token. ` +
+        `(debug_token says is_valid=${String(info.is_valid)}, type=${String(info.type)}, ` +
+        `expires=${expiryText}, profile_id=${String(info.profile_id || "")})`
+      );
     }
 
     const resolvedPageId = String(info.profile_id || "");
