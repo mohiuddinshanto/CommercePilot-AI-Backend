@@ -142,6 +142,7 @@ export class InboxController {
         req.query["hub.verify_token"],
         req.query["hub.challenge"]
       );
+      res.setHeader("Content-Type", "text/plain");
       res.status(200).send(challenge);
     } catch (error) {
       next(error);
