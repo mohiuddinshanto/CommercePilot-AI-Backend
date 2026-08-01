@@ -23,7 +23,7 @@ export function validateCreateConnection(
     errors.push({ field: "pageAccessToken", message: "A valid Page Access Token is required." });
   }
 
-  if (body.pageName !== undefined && (typeof body.pageName !== "string" || body.pageName.trim().length < 1)) {
+  if (body.pageName !== undefined && body.pageName !== "" && (typeof body.pageName !== "string" || body.pageName.trim().length < 1)) {
     errors.push({ field: "pageName", message: "Page name must be a non-empty string." });
   }
 
@@ -47,7 +47,7 @@ export function validateUpdateConnection(
     errors.push({ field: "pageAccessToken", message: "A valid Page Access Token is required." });
   }
 
-  if (body.pageName !== undefined && (typeof body.pageName !== "string" || body.pageName.trim().length < 1)) {
+  if (body.pageName !== undefined && body.pageName !== "" && (typeof body.pageName !== "string" || body.pageName.trim().length < 1)) {
     errors.push({ field: "pageName", message: "Page name must be a non-empty string." });
   }
 
